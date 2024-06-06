@@ -7,6 +7,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
     {
         public string start { get; set; }
         public string end { get; set; }
+        public int _id { get; set; }
         public string _uuid { get; set; }
 
         [JsonProperty(PropertyName = "grupo1/cidade")]
@@ -24,20 +25,32 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         [JsonProperty(PropertyName = "grupo1/Tem_bilhete_de_identidade_ced")]
         public string TipoDocumento { get; set; }
 
+        [JsonProperty(PropertyName = "grupo1/N_do_Bilhete_de_Identidade")]
+        public string NrBi { get; set; }
+
+        [JsonProperty(PropertyName = "grupo1/Local_de_emiss_o_do_ilhete_de_Identidade")]
+        public string LocalEmissaoBI { get; set; }
+
         [JsonProperty(PropertyName = "grupo1/Qual_o_numero_da_c_dula_pessoal")]
         public string NrDocumento { get; set; }
 
-        [JsonProperty(PropertyName = "grupo1/sexo")]
-        public string Sexo { get; set; }
+        [JsonProperty(PropertyName = "grupo1/Telefone")]
+        public string telefone { get; set; }
+
+        [JsonProperty(PropertyName = "grupo1/NUIT")]
+        public string nuit { get; set; }
+
+        [JsonProperty(PropertyName = "grupo1/n_casa")]
+        public int ncasa { get; set; }
 
         [JsonProperty(PropertyName = "grupo1/Bairro")]
         public string Bairro { get; set; }
 
+        [JsonProperty(PropertyName = "grupo1/endereco")]
+        public string endereco { get; set; }
+
         [JsonProperty(PropertyName = "grupo1/quarteirao")]
         public string Quarteirao { get; set; }
-
-        [JsonProperty(PropertyName = "grupo1/endereco")]
-        public string Endereco { get; set; }
 
         [JsonProperty(PropertyName = "grupo1/estado_civil")]
         public string EstadoCivil { get; set; }
@@ -65,6 +78,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
 
         [JsonProperty(PropertyName = "grupo3/Qual_o_meio_de_pag_usar_para_pagar_gua")]
         public string MeioPagamentoAgua { get; set; }
+
+        [JsonProperty(PropertyName = "group4/adicionado_PHC")]
+        public string adicionadoPHC { get; set; }
 
         public override string ToString() => JsonConvert.SerializeObject(this);
     }

@@ -25,5 +25,14 @@ namespace FIPAG_KOBOTOOLBOX.Controllers
             var response = _koboService.GetResult(nome);
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("registarCliente")]
+        public async Task<ActionResult<ResponseDTO>> RegistarCliente(int id)
+        {
+            var response = _koboService.RegistarCliente(id);
+            return Ok(response);
+        }
     }
 }
+

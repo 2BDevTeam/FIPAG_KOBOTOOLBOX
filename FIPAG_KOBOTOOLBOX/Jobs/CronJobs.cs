@@ -9,22 +9,19 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
         public void JobHandler()
         {
+            RecurringJob.AddOrUpdate(
+               "AddEmLevantamentoJB",
+               () => koboService.AdicionarLevantamentoBeneficiarios(),
+              Cron.Minutely());
+
+
+            var cronExpression = "0 */2 * * *";
+
             /*
-            BackgroundJob.Delete("SyncDocumentsJB");
             RecurringJob.AddOrUpdate(
-               "LiftHandlingJB",
-               () => oppService.ProcessarLifts(),
-              Cron.Minutely());
-
-            RecurringJob.AddOrUpdate(
-               "SyncDocumentsJB",
-               () => oppService.SyncDocumentsNotSynced(),
-              Cron.Minutely());
-
-            RecurringJob.AddOrUpdate(
-               "SyncPreDocumentsJB",
-               () => oppService.SyncPreDocumentsNotSynced(),
-               Cron.Minutely());
+               "AddFaturasNoKoboJB",
+               () => koboService.AdicionarLevantamentoBeneficiarios(),
+              cronExpression);
             */
         }
 

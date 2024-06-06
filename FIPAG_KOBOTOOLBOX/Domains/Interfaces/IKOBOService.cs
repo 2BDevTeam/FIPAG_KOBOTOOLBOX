@@ -5,6 +5,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
     public interface IKOBOService
     {
         public ResponseDTO GetResult(string nome);
+        public ResponseDTO RegistarCliente(int id);
 
     }
 }

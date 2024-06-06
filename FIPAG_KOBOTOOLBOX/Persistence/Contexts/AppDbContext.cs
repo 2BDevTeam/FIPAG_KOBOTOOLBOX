@@ -22,7 +22,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         public virtual DbSet<UProvider> UProvider { get; set; } = null!;
 
         public virtual DbSet<Cl> Cl { get; set; } = null!;
-        
+        public virtual DbSet<Em> Em { get; set; } = null!;
+
         public virtual DbSet<Us> Us { get; set; } = null!;
 
 
@@ -942,7 +943,151 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
             });
 
 
+            modelBuilder.Entity<Em>(entity =>
+            {
 
+                entity.HasKey(e => e.Emstamp)
+                    .HasName("pk_em")
+                    .IsClustered(false);
+
+                entity.Property(e => e.Emstamp)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("emstamp")
+                    .HasDefaultValueSql("('')")
+                    .IsFixedLength();
+
+                entity.Property(e => e.Nome)
+                .HasColumnName("nome");
+
+                entity.Property(e => e.No)
+                    .HasColumnType("numeric(16, 0)")
+                    .HasColumnName("no");
+
+                entity.Property(e => e.UKoboId)
+                    .HasColumnType("numeric(15, 0)")
+                    .HasColumnName("u_koboId");
+
+                entity.Property(e => e.Ultivisita)
+                  .HasDefaultValueSql("(CONVERT([datetime],'19000101',0))")
+                  .HasColumnType("datetime")
+                  .HasColumnName("ULTIVISITA");
+
+                entity.Property(e => e.Ousrdata)
+                    .HasColumnType("datetime")
+                    .HasColumnName("ousrdata")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Ousrhora)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .HasColumnName("ousrhora")
+                    .HasDefaultValueSql("('')");
+                entity.Property(e => e.Usrdata)
+                    .HasColumnType("datetime")
+                    .HasColumnName("usrdata")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Usrhora)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .HasColumnName("usrhora")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.UAndar)
+                .HasColumnName("u_andar");
+
+                entity.Property(e => e.UBiData)
+                .HasColumnName("u_bidata");
+
+                entity.Property(e => e.UBiLocal)
+                .HasColumnName("u_bilocal");
+
+                entity.Property(e => e.UBiNo)
+                .HasColumnName("u_bino");
+
+                entity.Property(e => e.UDistrit)
+                .HasColumnName("u_distrit");
+
+                entity.Property(e => e.UEndereco)
+                .HasColumnName("u_endereco");
+
+                entity.Property(e => e.UNRua)
+                .HasColumnName("u_nrua");
+
+                entity.Property(e => e.UNascimen)
+                .HasColumnName("u_nascimen");
+
+                entity.Property(e => e.UNatural)
+                .HasColumnName("u_natural");
+                entity.Property(e => e.UNcasa)
+                .HasColumnName("u_ncasa");
+                entity.Property(e => e.UNquart)
+                .HasColumnName("u_nquart");
+                entity.Property(e => e.UNtalhao)
+                .HasColumnName("u_ntalhao");
+                entity.Property(e => e.UPorta)
+                .HasColumnName("u_porta");
+                entity.Property(e => e.UPref)
+                .HasColumnName("u_pref");
+                entity.Property(e => e.UProvince)
+                .HasColumnName("u_province");
+                entity.Property(e => e.URua)
+                .HasColumnName("u_rua");
+
+                entity.Property(e => e.ConsFinal)
+               .HasColumnName("ConsFinal");
+                entity.Property(e => e.Cont3Pos).HasMaxLength(50) 
+                    .HasColumnName("Cont3Pos");
+                entity.Property(e => e.Cont2Pos).HasMaxLength(50) 
+                    .HasColumnName("Cont2Pos");
+                entity.Property(e => e.Morada).HasMaxLength(250) 
+                    .HasColumnName("Morada");
+                entity.Property(e => e.CPost).HasMaxLength(10) 
+                    .HasColumnName("CPost");
+                entity.Property(e => e.CPostL).HasMaxLength(50) 
+                    .HasColumnName("CPostL");
+                entity.Property(e => e.CTacto).HasMaxLength(50) 
+                    .HasColumnName("CTacto");
+                entity.Property(e => e.CTactPos).HasMaxLength(50) 
+                    .HasColumnName("CTactPos");
+                entity.Property(e => e.CTactTel).HasMaxLength(20) 
+                    .HasColumnName("CTactTel");
+                entity.Property(e => e.Cont2).HasMaxLength(50) 
+                    .HasColumnName("Cont2");
+                entity.Property(e => e.Cont3).HasMaxLength(50) 
+                    .HasColumnName("Cont3");
+                entity.Property(e => e.Telefone).HasMaxLength(20) 
+                    .HasColumnName("Telefone");
+                entity.Property(e => e.Tlmvl).HasMaxLength(20) 
+                    .HasColumnName("Tlmvl");
+                entity.Property(e => e.Fax).HasMaxLength(20) 
+                    .HasColumnName("Fax");
+                entity.Property(e => e.Zona).HasMaxLength(50) 
+                    .HasColumnName("Zona");
+                entity.Property(e => e.Vendedor)
+                    .HasColumnType("numeric(16, 0)")
+                    .HasColumnName("Vendedor");
+                entity.Property(e => e.VendNm).HasMaxLength(100) 
+                    .HasColumnName("VendNm");
+                entity.Property(e => e.Ncont).HasMaxLength(50) 
+                    .HasColumnName("Ncont");
+                entity.Property(e => e.Obs).HasColumnName("Obs"); 
+                entity.Property(e => e.InstalConc).HasMaxLength(50) 
+                    .HasColumnName("InstalConc");
+                entity.Property(e => e.ProxVisita) 
+                    .HasDefaultValueSql("(CONVERT([datetime],'1900-01-01',0))")
+                    .HasColumnType("datetime")
+                    .HasColumnName("ProxVisita");
+                entity.Property(e => e.UltiActual) 
+                    .HasDefaultValueSql("(CONVERT([datetime],'1900-01-01',0))")
+                    .HasColumnType("datetime")
+                    .HasColumnName("UltiActual");
+                entity.Property(e => e.Preco) 
+                    .HasColumnType("numeric(16, 3)")
+                    .HasColumnName("Preco");
+                entity.Property(e => e.Cartao).HasColumnName("Cartao");
+            });
 
 
             OnModelCreatingPartial(modelBuilder);
