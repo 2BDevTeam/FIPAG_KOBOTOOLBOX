@@ -102,7 +102,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
 
                     string json = JsonConvert.SerializeObject(body);
 
-                    streamWriter.Write(json);
+                    JObject jsonObject = JObject.Parse(json);
+                    RemoveNullProperties(jsonObject);
+
+                    string cleanedJson = jsonObject.ToString(Formatting.None);
+                    Debug.Print(cleanedJson);
+
+                    streamWriter.Write(cleanedJson);
                     streamWriter.Flush();
                     streamWriter.Close();
                 }
@@ -169,7 +175,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                             submission_ids = new List<int> { id },
                             data = new DataFormDTO
                             {
-                                isCliente = "true"
+                                isCliente = "true",
+                                beneficiarioNoPHC = "Sim"
                             }
                         },
                     };
@@ -259,8 +266,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
             catch (WebException ex)
             {
+                var responseStream = ex?.Response?.GetResponseStream();
+                if (responseStream == null)
+                {
+                    return null;
+                }
+                System.IO.StreamReader reader = new System.IO.StreamReader(responseStream);
 
-                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
                 String rawresp = reader.ReadToEnd();
                 Debug.WriteLine("GET GetResults WEB EXCEPTION  Response::::---::::: " + rawresp);
 
@@ -283,7 +295,80 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        private static void RemoveNullProperties(JToken token)
+        public InsertResponseDTO AddDataToKobo (InsertFormDTO body, string form)
+        {
+
+            string formID = _koboToolBoxHelper.GetKoboFormID(form);
+
+            try
+            {
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(200, "submissions", $"/submissions");
+                httpWebRequest.Method = "POST";
+
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    body.id = formID;
+
+                    string json = JsonConvert.SerializeObject(body);
+
+                    JObject jsonObject = JObject.Parse(json);
+                    RemoveNullProperties(jsonObject);
+
+                    string cleanedJson = jsonObject.ToString(Formatting.None);
+                    Debug.Print(cleanedJson);
+
+                    streamWriter.Write(cleanedJson);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+
+                StreamReader streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream());
+
+                result = streamReader.ReadToEnd();
+
+                Debug.Print($"RESULT Results {result}");
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                InsertResponseDTO results = JsonConvert.DeserializeObject<InsertResponseDTO>(result, settings);
+
+                return results;
+            }
+            catch (WebException ex)
+            {
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
+                String rawresp = reader.ReadToEnd();
+                Debug.WriteLine("UpdNaoAdicionadosPHC WEB EXCEPTION  Response::::---::::: " + rawresp);
+
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " + rawresp };
+                //Debug.Print($"ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", rawresp);
+
+                return null;
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"UpdNaoAdicionadosPHC ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", errorDTO?.ToString());
+                return null;
+
+            }
+        }
+
+
+        public void RemoveNullProperties(JToken token)
         {
             if (token.Type == JTokenType.Object)
             {
@@ -313,60 +398,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                 }
             }
         }
-        public BillOfLadingResponseDTO GetBillOfLadingByNumber(GetBillingOfLadingRequestDTO getBillingOfLadingDTO)
-        {
-            string encodedUrl = getBillingOfLadingDTO?.billOfLadingNumber.Replace("/", "%2F");
-            try
-            {
-                string result = "";
 
-                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProvider(200, "voyages", $"/voyages/{getBillingOfLadingDTO?.voyageNumber}/bill_of_ladings/{encodedUrl}.json");
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-
-                StreamReader streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream());
-
-                result = streamReader.ReadToEnd();
-
-                Debug.Print($"RESULT GetBillOfLadingByNumber {result}");
-                var settings = new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                };
-
-                BillOfLadingResponseDTO billOfLading = JsonConvert.DeserializeObject<BillOfLadingResponseDTO>(result, settings);
-
-
-
-                return billOfLading;
-            }
-            catch (WebException ex)
-            {
-
-                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
-                String rawresp = reader.ReadToEnd();
-                Debug.WriteLine("GET GetBillOfLadingByNumber WEB EXCEPTION  Response::::---::::: " + rawresp);
-
-                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " + rawresp };
-                //Debug.Print($"ERROR DTO {errorDTO}");
-                var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
-                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetBillOfLadingByNumber", rawresp);
-
-                return null;
-
-            }
-            catch (Exception ex)
-            {
-                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
-                Debug.Print($"GetBillOfLadingByNumber ERROR DTO {errorDTO}");
-                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
-                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetBillOfLadingByNumber", errorDTO?.ToString());
-                return null;
-
-            }
-        }
-
+        
     }
 }
 
-//OCTOPI API
+//KOBO API

@@ -14,9 +14,19 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                () => koboService.AdicionarLevantamentoBeneficiarios(),
               Cron.Minutely());
 
+            RecurringJob.AddOrUpdate(
+               "AddClDoKoboParaPHC",
+               () => koboService.AdicionarClDoKoboParaPHC(),
+              Cron.Minutely());
 
+
+            RecurringJob.AddOrUpdate(
+               "SincronizarFt",
+               () => koboService.SincronizarFt(),
+              Cron.Minutely());
+            
+            
             var cronExpression = "0 */2 * * *";
-
             /*
             RecurringJob.AddOrUpdate(
                "AddFaturasNoKoboJB",

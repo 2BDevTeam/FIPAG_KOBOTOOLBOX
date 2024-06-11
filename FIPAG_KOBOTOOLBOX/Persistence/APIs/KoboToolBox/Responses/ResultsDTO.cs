@@ -82,6 +82,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         [JsonProperty(PropertyName = "group4/adicionado_PHC")]
         public string adicionadoPHC { get; set; }
 
+        [JsonProperty(PropertyName = "group4/Nome_do_inquiridor")]
+        public string nomeinquiridor { get; set; }
+
+
         public override string ToString() => JsonConvert.SerializeObject(this);
     }
 }

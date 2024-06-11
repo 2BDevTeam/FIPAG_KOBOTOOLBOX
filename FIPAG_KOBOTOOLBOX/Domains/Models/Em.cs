@@ -103,6 +103,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public DateTime Ousrdata { get; set; }
         public DateTime Usrdata { get; set; }
         public decimal UKoboId{ get; set; }
-
+        public bool? UKoboOri { get; set; }
     }
 }
