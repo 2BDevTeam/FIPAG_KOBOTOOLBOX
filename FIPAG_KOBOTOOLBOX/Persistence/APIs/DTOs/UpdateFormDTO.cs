@@ -18,9 +18,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
         [JsonProperty(PropertyName = "group4/adicionado_PHC")]
         public string adicionado_PHC { get; set; }
 
-        [JsonProperty(PropertyName = "group4/Beneficiario_cliente_no_PHC")]
-        public string beneficiarioNoPHC { get; set; }
-
         [JsonProperty(PropertyName = "group4/isCliente")]
         public string isCliente { get; set; }
     }

@@ -33,8 +33,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             appDbContext.SaveChanges();
         }
 
-        
-
 
         public void BulkOverWrite<T>(List<List<T>> entityLists) where T : class
         {
@@ -101,6 +99,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         {
             return propertyList.Where(propert=>propert.Name == searchProperty.Name).Any();
         }
+
         public void UpsertEntity<T>(T entity, List<string> keysToExclude, List<KeyValuePair<string, object>> conditions, bool saveChanges) where T : class
         {
             var entityType = typeof(T);

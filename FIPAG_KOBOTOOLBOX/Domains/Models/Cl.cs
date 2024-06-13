@@ -234,6 +234,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public bool Ccadmin { get; set; }
         public bool Geramb { get; set; }
         public string Bic { get; set; } = null!;
+        public string UOrigem { get; set; } = null!;
         public string Iban { get; set; } = null!;
         public DateTime Datasdd { get; set; }
         public string Sepacode { get; set; } = null!;

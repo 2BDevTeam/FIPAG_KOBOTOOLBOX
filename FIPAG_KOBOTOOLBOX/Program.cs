@@ -47,8 +47,8 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IGenericRepository, GenericRepository>();
-builder.Services.AddScoped<IKOBORepository, KOBORepository>();
-builder.Services.AddScoped<IKOBOService, KOBOService>();
+builder.Services.AddScoped<IPHCRepository, PHCRepository>();
+builder.Services.AddScoped<IKoboService, KOBOService>();
 
 builder.Services.AddAuthentication(options =>
 {

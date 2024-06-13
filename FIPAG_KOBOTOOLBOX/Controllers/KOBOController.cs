@@ -11,9 +11,9 @@ namespace FIPAG_KOBOTOOLBOX.Controllers
     [ApiController]
     public class KOBOController : ControllerBase
     {
-        IKOBOService _koboService;
+        IKoboService _koboService;
 
-        public KOBOController(IKOBOService koboService)
+        public KOBOController(IKoboService koboService)
         {
             _koboService = koboService;
         }

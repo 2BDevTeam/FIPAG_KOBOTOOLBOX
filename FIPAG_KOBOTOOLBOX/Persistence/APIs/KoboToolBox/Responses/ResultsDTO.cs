@@ -28,6 +28,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         [JsonProperty(PropertyName = "grupo1/N_do_Bilhete_de_Identidade")]
         public string NrBi { get; set; }
 
+        [JsonProperty(PropertyName = "grupo1/Data_emissao_BI")]
+        public DateTime DataEmissaoBI { get; set; }
+
         [JsonProperty(PropertyName = "grupo1/Local_de_emiss_o_do_ilhete_de_Identidade")]
         public string LocalEmissaoBI { get; set; }
 

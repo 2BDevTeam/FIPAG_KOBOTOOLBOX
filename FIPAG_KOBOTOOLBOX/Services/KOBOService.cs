@@ -34,17 +34,17 @@ using AutoMapper.Features;
 
 namespace FIPAG_KOBOTOOLBOX.Services
 {
-    public class KOBOService : IKOBOService
+    public class KOBOService : IKoboService
     {
         private readonly LogHelper logHelper = new LogHelper();
-        private readonly KoboToolBoxAPI koboAPI = new KoboToolBoxAPI();
+        private readonly KoboAPI koboAPI = new KoboAPI();
 
 
-        private readonly IKOBORepository _KOBORespository;
+        private readonly IPHCRepository _KOBORespository;
         private readonly IGenericRepository _genericRepository;
         private readonly AppDbContext _appDbContext;
 
-        public KOBOService(IKOBORepository KOBORepository, IGenericRepository genericRepository, AppDbContext appDbContext)
+        public KOBOService(IPHCRepository KOBORepository, IGenericRepository genericRepository, AppDbContext appDbContext)
         {
             _KOBORespository = KOBORepository;
             _appDbContext = appDbContext;
@@ -84,18 +84,21 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Nome = dado.nome_chefe_af.Trim(),
                         Pais = dado.PaisOrigem,
                         UNascimen = dado.DataDeNascimento,
-
-                        UBiNo = dado.NrBi,
-                        UBiLocal = dado.LocalEmissaoBI,
+                        Local = dado.cidade,
+                        Morada = $"{dado.endereco}, {dado.Quarteirao}, {dado.ncasa}",
+                        UBidata = dado.DataEmissaoBI,
+                        UBino = dado.NrBi,
+                        UBilocal = dado.LocalEmissaoBI,
                         Telefone = dado.telefone,
                         Ncont = dado.nuit,
-                        OusrInis = dado.nuit,
-                        Segmento = "OBS",
+                        Pncont = "MZ",
+                        Ousrinis = dado.nuit,
+                        UOrigem = "KoboToolbox",
                         //UNquart =dado.Quarteirao,
                         UNcasa = dado.ncasa,
                         UEndereco = dado.endereco,
-                        UKoboId = dado._id,
-                        UKoboOri = true,
+                        UKoboid = dado._id,
+                        UKoboori = true,
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
                         Ousrhora = DateTime.Now.ToString("HH:mm"),
@@ -116,14 +119,15 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public async Task AdicionarClDoKoboParaPHC()
+        public async Task AdicionarLigacoesDeCls()
         {
-            var cl = _KOBORespository.GetClNaoSincronizados();
-            Debug.Print($"TOTAL DE CLIENTES POR SINCRONIZAR {cl.Count()}");
+            var ligacoes = _KOBORespository.GetClNaoSincronizadosLigacoes();
+            Debug.Print($"TOTAL DE CLIENTES LICAÇÃO POR SINCRONIZAR {ligacoes.Count()}");
 
-            foreach (var cli in cl)
+            foreach (var li in ligacoes)
             {
-                RegistarCliente((int) cli.UKoboid);
+                //RegistarCliente(li.IDBenefKobo);
+                SyncLigacao(li);
             }
         }
 
@@ -149,7 +153,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             try
             {
 
-                var data = cons.Fdata.ToString("yyyy-MM-dd");
+                var data = cons.Fdata.ToString("yyyy-MM-dd") + "T00:00:00+02:00";
 
                 InsertFormDTO body = new()
                 {
@@ -170,7 +174,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         {
                             nmdoc = cons.Nmdoc,
                             fno = cons.Fno,
-                            consumoMensal = cons.ConsumoMensal,
                             totalMeticais = cons.TotalMeticais,
                             fdata = data
                         },
@@ -178,11 +181,11 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         {
                             tipoFatura = cons.TipoFatura,
                             periodo = cons.Periodo,
-                            leituraAnterior=cons.LeituraAnterior,
-                            leituraActual=cons.LeituraActual,
-                            consumoFaturado=cons.ConsumoFaturado,
-                            consumoReal=cons.ConsumoReal,
-                            anomalia=cons.Anomalia
+                            leituraAnterior = cons.LeituraAnterior,
+                            leituraActual = cons.LeituraActual,
+                            consumoFaturado = cons.ConsumoFaturado,
+                            consumoReal = cons.ConsumoReal,
+                            anomalia = cons.Anomalia
                         }
                     }
                 };
@@ -198,7 +201,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 var insertFt = koboAPI.AddDataToKobo(body, "Consumos");
 
-                if ( insertFt == null || insertFt.message != "Successful submission.")
+                if (insertFt == null || insertFt.message != "Successful submission.")
                 {
                     throw new Exception("Erro a introduzir a fatura no KoboToolbox.");
                 }
@@ -220,6 +223,66 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
+        public void SyncLigacao(Ligacoes lig)
+        {
+
+            try
+            {
+
+                InsertFormDTO body = new()
+                {
+                    id = "",
+                    submission = new SubmissionDataDTO
+                    {
+                        meta = new MetaDataDTO
+                        {
+                            instanceID = "uuid:2BPHCadmin"
+                        },
+                        Group1Ligacoes = new Group1Ligacoes
+                        {
+                            no = (int)lig.No,
+                            nome = lig.Nome,
+                            DataLigacao = lig.dataLigacao.ToString("yyyy-MM-dd") + "T00:00:00+02:00",
+                            IDBenefKobo = lig.IDBenefKobo
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(body);
+
+                JObject jsonObject = JObject.Parse(json);
+                koboAPI.RemoveNullProperties(jsonObject);
+
+
+                string cleanedJson = jsonObject.ToString(Formatting.None);
+                Debug.Print($"Json limpo Fatura {cleanedJson}");
+
+                var insertFt = koboAPI.AddDataToKobo(body, "Ligações");
+
+                if (insertFt == null || insertFt.message != "Successful submission.")
+                {
+                    throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
+                }
+
+                var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo);
+
+
+                var cliente = _KOBORespository.GetClPorIdKobo(lig.IDBenefKobo);
+                cliente.UKoboSync = true;
+                
+                _genericRepository.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"SyncFactura ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncFactura", errorDTO?.ToString());
+            }
+        }
+
+
 
         public ResponseDTO GetResult(string nome)
         {
@@ -227,7 +290,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
             var response = koboAPI.GetResult(nome);
 
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
-
         }
 
         public ResponseDTO RegistarCliente(int id)
@@ -235,19 +297,19 @@ namespace FIPAG_KOBOTOOLBOX.Services
             var cliente = _KOBORespository.GetClPorIdKobo(id);
 
             var responseID = logHelper.generateResponseID();
+            //var response2 = koboAPI.UpdIsClientePHC(id);
             var response = koboAPI.UpdIsClientePHC(id);
 
             //try
 
+
             if (response.failures == 0)
             {
                 cliente.UKoboSync = true;
-
+                cliente.UOrigem = "KoboToolbox";
                 _genericRepository.SaveChanges();
             }
 
-
-            
 
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
         }

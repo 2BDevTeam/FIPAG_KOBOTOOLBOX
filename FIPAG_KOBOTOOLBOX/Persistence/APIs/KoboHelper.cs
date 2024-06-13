@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.APIs
 {
-    public class KoboToolBoxHelper
+    public class KoboHelper
     {
 
         public string GetKoboFormID(string form)

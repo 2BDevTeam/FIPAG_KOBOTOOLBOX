@@ -16,7 +16,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
             RecurringJob.AddOrUpdate(
                "AddClDoKoboParaPHC",
-               () => koboService.AdicionarClDoKoboParaPHC(),
+               () => koboService.AdicionarLigacoesDeCls(),
               Cron.Minutely());
 
 

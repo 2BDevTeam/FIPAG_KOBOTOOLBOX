@@ -8,11 +8,11 @@ using static System.Net.WebRequestMethods;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class KOBORepository : IKOBORepository
+    public class PHCRepository : IPHCRepository
     {
         private readonly AppDbContext _appDbContext;
 
-        public KOBORepository(AppDbContext appDbContext)
+        public PHCRepository(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }
@@ -28,11 +28,26 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 FirstOrDefault(ft => ft.Ftstamp == ftstamp);
         }
 
-        public List<Cl> GetClNaoSincronizados()
+        public List<Ligacoes> GetClNaoSincronizadosLigacoes()
         {
-            return _appDbContext.Cl
-                .Where(cl => cl.UKoboOri == true && cl.UKoboSync == false)
-                .ToList();
+            return _appDbContext.Cl2
+            .Join(_appDbContext.Cl,
+                  cl2 => cl2.Cl2stamp,
+                  cl => cl.Clstamp,
+                  (cl2, cl) => new { Cl2 = cl2, Cl = cl })
+               .Where(joined => joined.Cl.UKoboOri == true &&
+                                joined.Cl.Tipo == "1-Activo" &&
+                                joined.Cl.UKoboSync == false
+                                )
+               .Select(joined => new Ligacoes
+               {
+                   Clstamp = joined.Cl.Clstamp,
+                   No = (int)joined.Cl.No,
+                   Nome = joined.Cl.Nome,
+                   IDBenefKobo = (int)joined.Cl.UKoboid,
+                   dataLigacao = joined.Cl2.UIniciof
+               })
+               .ToList();
         }
 
         public Cl GetClPorIdKobo(int idKobo)
@@ -66,10 +81,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                     Clstamp = joined.Cl.Clstamp,
                     No = (int)joined.Ft.No,
                     Nome = joined.Ft.Nome,
-                    IDBenefKobo = (int) joined.Cl.UKoboid,
+                    IDBenefKobo = (int)joined.Cl.UKoboid,
                     Nmdoc = joined.Ft.Nmdoc,
                     Fno = (int)joined.Ft.Fno,
-                    ConsumoMensal = 0,
                     TotalMeticais = joined.Ft.Total,
                     Fdata = joined.Ft.Fdata,
                     TipoFatura = joined.Ft3.UTipofac,
@@ -91,6 +105,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                          .DefaultIfEmpty(0)
                          .Max() + 1;
         }
+
+
     }
 }
 

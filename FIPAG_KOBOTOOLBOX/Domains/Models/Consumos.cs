@@ -11,7 +11,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public int IDBenefKobo { get; set; }
         public string Nmdoc { get; set; }
         public int Fno { get; set; }
-        public decimal ConsumoMensal { get; set; }
         public decimal TotalMeticais { get; set; }
         public DateTime Fdata { get; set; }
         public string? TipoFatura { get; set; }

@@ -16,12 +16,12 @@ using System.Text.Json;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
 {
-    public class KoboToolBoxAPI
+    public class KoboAPI
     {
 
         private readonly HttpHelper httpHelper = new HttpHelper();
         private readonly LogHelper logHelper = new LogHelper();
-        private KoboToolBoxHelper _koboToolBoxHelper = new KoboToolBoxHelper();
+        private KoboHelper _koboToolBoxHelper = new KoboHelper();
 
         public ResultsResponseDTO GetResult(string nome)
         {
@@ -175,8 +175,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                             submission_ids = new List<int> { id },
                             data = new DataFormDTO
                             {
-                                isCliente = "true",
-                                beneficiarioNoPHC = "Sim"
+                                isCliente = "true"
                             }
                         },
                     };
@@ -237,7 +236,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public ResultsResponseDTO GetFormNaoAdicionadosPHC()
+
+        public ResultsResponseDTO GetFormNaoAdicionadosPHC2()
         {
             string formID = "aj3EiDTv5DmsrxsPEGwi28";
             try
@@ -295,9 +295,80 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
+
+        public ResultsResponseDTO GetFormNaoAdicionadosPHC()
+        {
+            string formID = "aj3EiDTv5DmsrxsPEGwi28";
+            int limit = 100;
+            int start = 0;
+            List<ResultsDTO> allResults = new List<ResultsDTO>();
+
+            try
+            {
+                while (true)
+                {
+                    string result = "";
+
+                    HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
+                        200,
+                        "assets",
+                        $"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
+                    );
+
+                    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    {
+                        result = streamReader.ReadToEnd();
+                    }
+
+                    var settings = new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                    };
+
+                    ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
+                    if (results.results == null || results.results.Count == 0)
+                    {
+                        break;
+                    }
+
+                    allResults.AddRange(results.results);
+                    start += limit;
+                }
+
+                return new ResultsResponseDTO { results = allResults };
+            }
+            catch (WebException ex)
+            {
+                var responseStream = ex?.Response?.GetResponseStream();
+                if (responseStream == null)
+                {
+                    return null;
+                }
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    String rawresp = reader.ReadToEnd();
+                    Debug.WriteLine("GET GetResults WEB EXCEPTION Response::::---::::: " + rawresp);
+                    var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + " " + rawresp };
+                    var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                    logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", rawresp);
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + " " };
+                Debug.Print($"GetResults ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", errorDTO?.ToString());
+                return null;
+            }
+        }
+
+
+
         public InsertResponseDTO AddDataToKobo (InsertFormDTO body, string form)
         {
-
             string formID = _koboToolBoxHelper.GetKoboFormID(form);
 
             try
