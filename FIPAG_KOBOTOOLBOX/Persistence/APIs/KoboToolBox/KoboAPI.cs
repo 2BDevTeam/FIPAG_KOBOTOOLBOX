@@ -236,6 +236,86 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
+        public UpdateResponseDTO UpdEstadoLigacao(int id, string estado)
+        {
+            string formID = "aRGAdMpcPyV8dgjnisTatW";
+            try
+            {
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(200, "assets", $"/{formID}/data/bulk/?format=json");
+                httpWebRequest.Method = "PATCH";
+
+                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                {
+                    UpdateFormDTO body = new UpdateFormDTO
+                    {
+                        payload = new PayloadFormDTO
+                        {
+                            submission_ids = new List<int> { id },
+                            data = new DataFormDTO
+                            {
+                                EstadoLigacao = estado
+                            }
+                        },
+                    };
+
+                    string json = JsonConvert.SerializeObject(body);
+
+                    JObject jsonObject = JObject.Parse(json);
+                    RemoveNullProperties(jsonObject);
+
+                    string cleanedJson = jsonObject.ToString(Formatting.None);
+                    Debug.Print(cleanedJson);
+
+                    streamWriter.Write(cleanedJson);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+                }
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+
+                StreamReader streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream());
+
+                result = streamReader.ReadToEnd();
+
+                Debug.Print($"RESULT Results {result}");
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                UpdateResponseDTO results = JsonConvert.DeserializeObject<UpdateResponseDTO>(result, settings);
+
+                return results;
+            }
+            catch (WebException ex)
+            {
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
+                String rawresp = reader.ReadToEnd();
+                Debug.WriteLine("UpdNaoAdicionadosPHC WEB EXCEPTION  Response::::---::::: " + rawresp);
+
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " + rawresp };
+                //Debug.Print($"ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", rawresp);
+
+                return null;
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"UpdNaoAdicionadosPHC ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResults", errorDTO?.ToString());
+                return null;
+
+            }
+        }
+
 
         public ResultsResponseDTO GetFormNaoAdicionadosPHC2()
         {

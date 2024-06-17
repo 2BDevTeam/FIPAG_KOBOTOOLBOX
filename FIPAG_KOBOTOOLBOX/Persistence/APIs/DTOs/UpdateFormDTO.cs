@@ -20,6 +20,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
 
         [JsonProperty(PropertyName = "group4/isCliente")]
         public string isCliente { get; set; }
+
+        public string EstadoLigacao { get; set; }
     }
 
 }

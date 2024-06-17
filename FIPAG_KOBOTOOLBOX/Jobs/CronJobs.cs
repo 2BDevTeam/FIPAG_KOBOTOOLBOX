@@ -9,11 +9,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
         public void JobHandler()
         {
-            RecurringJob.AddOrUpdate(
-               "AddEmLevantamentoJB",
-               () => koboService.AdicionarLevantamentoBeneficiarios(),
-              Cron.Minutely());
-
+            /*-------Jobs Temporários para sincronização de beneficiários já existentes no PHC-------*/
             RecurringJob.AddOrUpdate(
                "AddClDoKoboParaPHC",
                () => koboService.AdicionarLigacoesDeCls(),
@@ -24,15 +20,20 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "SincronizarFt",
                () => koboService.SincronizarFt(),
               Cron.Minutely());
-            
-            
-            var cronExpression = "0 */2 * * *";
-            /*
+            /*------- FIM -------*/
+
+
+
             RecurringJob.AddOrUpdate(
-               "AddFaturasNoKoboJB",
+               "AddEmLevantamentoJB",
                () => koboService.AdicionarLevantamentoBeneficiarios(),
-              cronExpression);
-            */
+              Cron.Minutely());
+
+            RecurringJob.AddOrUpdate(
+               "SincrinizarDadosUSyncQueue",
+               () => koboService.SincrinizarDadosUSyncQueue(),
+              Cron.Minutely());
+
         }
 
     }

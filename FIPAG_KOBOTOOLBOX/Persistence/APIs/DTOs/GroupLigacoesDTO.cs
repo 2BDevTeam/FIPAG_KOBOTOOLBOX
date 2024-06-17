@@ -11,6 +11,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
 
         [JsonProperty(PropertyName = "ID_Benef_Kobo")]
         public int IDBenefKobo { get; set; }
+
+        public string EstadoLigacao { get; set; }
     }
 
 }

@@ -246,6 +246,5 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public bool Nprotri { get; set; }
         public Guid Rowid { get; set; }
         public decimal UOrdem { get; set; }
-        public bool UKobosync { get; set; }
     }
 }

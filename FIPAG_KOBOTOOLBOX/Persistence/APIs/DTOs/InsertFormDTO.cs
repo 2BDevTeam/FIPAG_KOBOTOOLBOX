@@ -11,6 +11,11 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
     public class SubmissionDataDTO
     {
         public MetaDataDTO meta { get; set; }
+        public string start { get; set; }
+        public string end { get; set; }
+        public string today { get; set; }
+        public string username { get; set; }
+
 
         //Consumos
         public Group1Consumos Group1Consumos { get; set; }
