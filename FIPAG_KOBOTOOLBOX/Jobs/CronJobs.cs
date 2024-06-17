@@ -10,6 +10,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
         public void JobHandler()
         {
             /*-------Jobs Temporários para sincronização de beneficiários já existentes no PHC-------*/
+            /*
             RecurringJob.AddOrUpdate(
                "AddClDoKoboParaPHC",
                () => koboService.AdicionarLigacoesDeCls(),
@@ -20,10 +21,15 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "SincronizarFt",
                () => koboService.SincronizarFt(),
               Cron.Minutely());
+            */
             /*------- FIM -------*/
 
+            RecurringJob.AddOrUpdate(
+              "GetNrCl",
+              () => koboService.GetNrCl(),
+             Cron.Minutely());
 
-
+            /*
             RecurringJob.AddOrUpdate(
                "AddEmLevantamentoJB",
                () => koboService.AdicionarLevantamentoBeneficiarios(),
@@ -33,7 +39,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "SincrinizarDadosUSyncQueue",
                () => koboService.SincrinizarDadosUSyncQueue(),
               Cron.Minutely());
-
+            */
         }
 
     }

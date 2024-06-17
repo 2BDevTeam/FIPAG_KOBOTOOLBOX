@@ -8,36 +8,45 @@ using static System.Net.WebRequestMethods;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class PHCRepository : IPHCRepository
+    public class PHCRepository <TContext>: IPHCRepository <TContext> where TContext : DbContext
     {
+        /*
         private readonly AppDbContext _appDbContext;
 
         public PHCRepository(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
         }
+        */
 
+        private readonly TContext _context;
+
+        public PHCRepository(TContext context)
+        {
+            _context = context;
+        }
+        
         public List<Cl> GetClients()
         {
-            return _appDbContext.Cl.ToList();
+            return _context.Set<Cl>().ToList();
         }
 
         public Ft GetFt(string ftstamp)
         {
-            return _appDbContext.Ft.
+            return _context.Set<Ft>().
                 FirstOrDefault(ft => ft.Ftstamp == ftstamp);
         }
 
         public Ft2 GetFt2(string ft2stamp)
         {
-            return _appDbContext.Ft2.
+            return _context.Set<Ft2>().
                 FirstOrDefault(ft => ft.Ft2stamp == ft2stamp);
         }
 
         public List<Ligacoes> GetClNaoSincronizadosLigacoes()
         {
-            return _appDbContext.Cl2
-            .Join(_appDbContext.Cl,
+            return _context.Set<Cl2>()
+            .Join(_context.Set<Cl>(),
                   cl2 => cl2.Cl2stamp,
                   cl => cl.Clstamp,
                   (cl2, cl) => new { Cl2 = cl2, Cl = cl })
@@ -59,8 +68,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         public Ligacoes GetClNaoSincronizadosLigacoes(string clstamp)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return _appDbContext.Cl2
-            .Join(_appDbContext.Cl,
+            return _context.Set<Cl2>()
+            .Join(_context.Set<Cl>(),
                   cl2 => cl2.Cl2stamp,
                   cl => cl.Clstamp,
                   (cl2, cl) => new { Cl2 = cl2, Cl = cl })
@@ -82,14 +91,14 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         public Cl GetClPorIdKobo(int idKobo)
         {
-            return _appDbContext.Cl
+            return _context.Set<Cl>()
                 .FirstOrDefault(cl => cl.UKoboid == idKobo);
         }
 
 
         public List<USyncQueue> GetUSyncQueue()
         {
-            return _appDbContext.USyncqueue
+            return _context.Set<USyncQueue>()
                .ToList();
         }
 
@@ -99,16 +108,16 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             DateTime today = DateTime.Today;
             DateTime specificDate = new DateTime(2024, 5, 27);
 
-            return _appDbContext.Ft
-                .Join(_appDbContext.Cl,
+            return _context.Set<Ft>()
+                .Join(_context.Set<Cl>(),
                       ft => ft.No,
                       cl => cl.No,
                       (ft, cl) => new { Ft = ft, Cl = cl })
-                .Join(_appDbContext.Ft3,
+                .Join(_context.Set<Ft3>(),
                       joined => joined.Ft.Ftstamp,
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
-                .Join(_appDbContext.Ft2,
+                .Join(_context.Set<Ft2>(),
                       joined => joined.Ft.Ftstamp, 
                       ft2 => ft2.Ft2stamp,
                       (joined, ft2) => new { joined.Ft, joined.Cl, joined.Ft3, Ft2 = ft2 })
@@ -144,12 +153,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             DateTime specificDate = new DateTime(2024, 5, 27);
 
 #pragma warning disable CS8603 // Possible null reference return.
-            return _appDbContext.Ft
-                .Join(_appDbContext.Cl,
+            return _context.Set<Ft>()
+                .Join(_context.Set<Cl>(),
                       ft => ft.No,
                       cl => cl.No,
                       (ft, cl) => new { Ft = ft, Cl = cl })
-                .Join(_appDbContext.Ft3,
+                .Join(_context.Set<Ft3>(),
                       joined => joined.Ft.Ftstamp,
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
@@ -180,13 +189,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         public decimal GetNoEm()
         {
-            return _appDbContext.Em
+            return _context.Set<Em>()
                          .Select(em => em.No)
                          .ToList()
                          .DefaultIfEmpty(0)
                          .Max() + 1;
         }
-
 
     }
 }

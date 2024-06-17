@@ -40,13 +40,14 @@ namespace FIPAG_KOBOTOOLBOX.Services
         private readonly KoboAPI koboAPI = new KoboAPI();
 
 
-        private readonly IPHCRepository _PHCRespository;
+        //private readonly IPHCRepository _PHCRespository;
+        private readonly IPHCRepository<AppDbContext> _phcRepository1;
         private readonly IGenericRepository _genericRepository;
         private readonly AppDbContext _appDbContext;
 
-        public KOBOService(IPHCRepository KOBORepository, IGenericRepository genericRepository, AppDbContext appDbContext)
+        public KOBOService(IPHCRepository<AppDbContext> KOBORepository, IGenericRepository genericRepository, AppDbContext appDbContext)
         {
-            _PHCRespository = KOBORepository;
+            _phcRepository1 = KOBORepository;
             _appDbContext = appDbContext;
             _genericRepository = genericRepository;
         }
@@ -55,6 +56,27 @@ namespace FIPAG_KOBOTOOLBOX.Services
         {
 
         }
+
+
+
+        public async Task GetNrCl()
+        {
+
+            var ligacoes = _phcRepository1.GetClients();
+
+            Debug.Print($"TOTAL DE CLIENTES {ligacoes.Count()}");
+
+
+
+            foreach (var li in ligacoes)
+            {
+                //RegistarCliente(li.IDBenefKobo);
+                //SyncLigacao(li);
+            }
+        }
+
+        /*
+
 
         public async Task AdicionarLevantamentoBeneficiarios()
         {
@@ -431,6 +453,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
         }
+
+
+        */
     }
 
 }
