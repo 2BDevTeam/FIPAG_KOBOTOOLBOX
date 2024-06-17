@@ -116,5 +116,12 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public decimal UDesvio { get; set; }
         public decimal UConsuman { get; set; }
         public bool UTemesc0 { get; set; }
+
+
+        public string UOrigem { get; set; } = null!;
+        public decimal UKoboid { get; set; }
+        public bool UKoboOri { get; set; }
+        public bool UKoboSync { get; set; }
+
     }
 }

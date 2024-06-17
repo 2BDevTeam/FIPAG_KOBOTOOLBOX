@@ -218,7 +218,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public bool Autofact { get; set; }
         public string Mesesnaopag { get; set; } = null!;
         public string Diaspag { get; set; } = null!;
-        public Guid Rowid { get; set; }
         public string C1email { get; set; } = null!;
         public string C2email { get; set; } = null!;
         public string C3email { get; set; } = null!;
@@ -234,7 +233,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public bool Ccadmin { get; set; }
         public bool Geramb { get; set; }
         public string Bic { get; set; } = null!;
-        public string UOrigem { get; set; } = null!;
         public string Iban { get; set; } = null!;
         public DateTime Datasdd { get; set; }
         public string Sepacode { get; set; } = null!;
@@ -245,8 +243,5 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public decimal Taxairs { get; set; }
         public bool Txirspersonalizada { get; set; }
         public decimal UNumetica { get; set; }
-        public decimal UKoboid { get; set; }
-        public bool UKoboOri { get; set; }
-        public bool UKoboSync { get; set; }
     }
 }

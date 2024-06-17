@@ -29,12 +29,12 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
               () => koboService.GetNrCl(),
              Cron.Minutely());
 
-            /*
             RecurringJob.AddOrUpdate(
                "AddEmLevantamentoJB",
-               () => koboService.AdicionarLevantamentoBeneficiarios(),
+               () => koboService.AdicionarLevantamentoBeneficiarios("OnBD"),
               Cron.Minutely());
 
+            /*
             RecurringJob.AddOrUpdate(
                "SincrinizarDadosUSyncQueue",
                () => koboService.SincrinizarDadosUSyncQueue(),

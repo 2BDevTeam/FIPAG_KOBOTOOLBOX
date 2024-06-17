@@ -41,15 +41,18 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
         //private readonly IPHCRepository _PHCRespository;
-        private readonly IPHCRepository<AppDbContext> _phcRepository1;
-        private readonly IGenericRepository _genericRepository;
-        private readonly AppDbContext _appDbContext;
+        private readonly IPHCRepository<AppDbContextOnBD> _phcRepositoryOnBD;
+        private readonly IPHCRepository<AppDbContextOnTS> _phcRepositoryOnTS;
+        private readonly IGenericRepository<AppDbContextOnBD> _genericRepositoryOnBD;
+        private readonly IGenericRepository<AppDbContextOnTS> _genericRepositoryOnTS;
 
-        public KOBOService(IPHCRepository<AppDbContext> KOBORepository, IGenericRepository genericRepository, AppDbContext appDbContext)
+        public KOBOService(IPHCRepository<AppDbContextOnBD> OnBD_Repository, IPHCRepository<AppDbContextOnTS> OnTS_Repository,
+            IGenericRepository<AppDbContextOnBD> genericRepositoryOnBD, IGenericRepository<AppDbContextOnTS> genericRepositoryOnTS)
         {
-            _phcRepository1 = KOBORepository;
-            _appDbContext = appDbContext;
-            _genericRepository = genericRepository;
+            _phcRepositoryOnBD = OnBD_Repository;
+            _phcRepositoryOnTS = OnTS_Repository;
+            _genericRepositoryOnBD = genericRepositoryOnBD;
+            _genericRepositoryOnTS = genericRepositoryOnTS;
         }
 
         public KOBOService()
@@ -62,23 +65,27 @@ namespace FIPAG_KOBOTOOLBOX.Services
         public async Task GetNrCl()
         {
 
-            var ligacoes = _phcRepository1.GetClients();
+            /*
+             * 
+            var ligacoes = _phcRepositoryOnTS.GetClients();
 
-            Debug.Print($"TOTAL DE CLIENTES {ligacoes.Count()}");
+            Debug.Print($"TOTAL DE CLIENTES ON TS {ligacoes.Count()}");
 
-
+            ligacoes = _phcRepositoryOnBD.GetClients();
+            Debug.Print($"TOTAL DE CLIENTES ON BD {ligacoes.Count()}");
 
             foreach (var li in ligacoes)
             {
                 //RegistarCliente(li.IDBenefKobo);
                 //SyncLigacao(li);
             }
+
+            */
         }
 
-        /*
 
 
-        public async Task AdicionarLevantamentoBeneficiarios()
+        public async Task AdicionarLevantamentoBeneficiarios(string DB)
         {
 
             try
@@ -92,6 +99,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
+                var emNo = Sw_GetEmNo(DB);
+
                 foreach (var dado in dados.results)
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
@@ -100,7 +109,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     var em = new Em
                     {
                         Emstamp = 25.UseThisSizeForStamp(),
-                        No = _PHCRespository.GetNoEm(),
+                        No = emNo,
                         Zona = dado.Bairro,
                         Nome = dado.nome_chefe_af.Trim(),
                         Pais = dado.PaisOrigem,
@@ -126,10 +135,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Usrhora = DateTime.Now.ToString("HH:mm")
                     };
 
-
-                    _genericRepository.Add(em);
-                    _genericRepository.SaveChanges();
+                    Sw_Add(DB, em);
+                    emNo++;
                 }
+
+                Sw_SaveChanges(DB);
+
             }
             catch (Exception ex)
             {
@@ -139,6 +150,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         }
 
+        /*
 
         public async Task AdicionarLigacoesDeCls()
         {
@@ -456,6 +468,55 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
         */
+
+        decimal Sw_GetEmNo(string DBname)
+        {
+            decimal val = (decimal)0;
+
+            switch (DBname)
+            {
+                case "OnBD":
+                    val = _phcRepositoryOnBD.GetNoEm();
+                    break;
+                case "OnTS":
+                    val = _phcRepositoryOnTS.GetNoEm();
+                    break;
+                default:
+                    break;
+            }
+
+            return val;
+        }
+
+        void Sw_SaveChanges(string DBname)
+        {
+            switch (DBname)
+            {
+                case "OnBD":
+                    _genericRepositoryOnBD.SaveChanges();
+                    break;
+                case "OnTS":
+                    _genericRepositoryOnTS.SaveChanges();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void Sw_Add(string DBname, object obj)
+        {
+            switch (DBname)
+            {
+                case "OnBD":
+                    _genericRepositoryOnBD.Add(obj);
+                    break;
+                case "OnTS":
+                    _genericRepositoryOnTS.Add(obj);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
 }

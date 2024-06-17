@@ -18,14 +18,16 @@ using FIPAG_KOBOTOOLBOX.DTOs;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class GenericRepository : IGenericRepository
+    public class GenericRepository<TContext> : IGenericRepository<TContext> where TContext : DbContext
     {
-        private readonly AppDbContext appDbContext;
+
+        private readonly TContext appDbContext;
+
         private readonly ConversionExtension conversionExtension=new ConversionExtension();
 
-        public GenericRepository(AppDbContext SGOFCTX)
+        public GenericRepository(TContext _appDbContext)
         {
-            appDbContext = SGOFCTX;
+            appDbContext = _appDbContext;
         }
 
         public void SaveChanges()
@@ -385,104 +387,5 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         }
 
 
-        //public void DynamicContextUpsertEntity<T>(T entity, string keyToExclude, List<KeyValuePair<string, object>> conditions, DynamicContext context, bool saveChanges) where T : class
-        //{
-        //    var entityType = typeof(T);
-
-
-        //    var keyToExcludeProperty = entityType.GetProperty(keyToExclude);
-
-        //    if (keyToExcludeProperty == null)
-        //    {
-        //        throw new InvalidOperationException($"Entity does not have a property named '{keyToExcludeProperty}'.");
-        //    }
-
-
-
-
-
-        //    // Add more conditions as needed
-
-        //    var parameter = Expression.Parameter(entityType, "e");
-        //    Expression combinedCondition = null;
-
-        //    foreach (var condition in conditions)
-        //    {
-        //        var keyProperty = entityType.GetProperty(condition.Key);
-        //        if (keyProperty == null)
-        //        {
-        //            throw new InvalidOperationException($"Entity does not have a property named '{keyProperty}'.");
-        //        }
-        //        var property = entityType.GetProperty(condition.Key);
-        //        var propertyValue = condition.Value;
-        //        var propertyExpression = Expression.Property(parameter, property);
-        //        var constant = Expression.Constant(propertyValue);
-        //        var equalExpression = Expression.Equal(propertyExpression, constant);
-
-        //        if (combinedCondition == null)
-        //        {
-        //            combinedCondition = equalExpression;
-        //        }
-        //        else
-        //        {
-        //            combinedCondition = Expression.AndAlso(combinedCondition, equalExpression);
-        //        }
-        //    }
-
-        //    var lambda = Expression.Lambda<Func<T, bool>>(combinedCondition, parameter);
-        //    // var existingEntity = context.Set<T>().Where(lambda).FirstOrDefault();
-
-        //    var existingEntity = context.Set<T>().Where(lambda).FirstOrDefault();
-
-
-
-
-
-
-
-        //    if (existingEntity != null)
-        //    {
-        //        Debug.Print($"EXISTING ENTITY NOT NULL  ");
-        //        foreach (var property in entityType.GetProperties())
-        //        {
-        //            if (property != keyToExcludeProperty)
-        //            {
-        //                var newValue = property.GetValue(entity);
-
-        //                // Debug.Print($"property.Name {property.Name}: {newValue}");
-
-
-        //                if (newValue != null)
-        //                {
-        //                    var finalValue = newValue;
-        //                    if (property.PropertyType == typeof(DateTime))
-        //                    {
-
-        //                        finalValue = conversionExtension.ParseToDate(newValue);
-        //                    }
-
-
-        //                    property.SetValue(existingEntity, finalValue);
-
-        //                }
-
-
-        //            }
-        //        }
-
-        //        context.Entry(existingEntity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-        //    }
-        //    else
-        //    {
-        //        Debug.Print("New Entity");
-        //        context.Set<T>().Add(entity);
-        //    }
-
-        //    if (saveChanges)
-        //    {
-        //        context.SaveChanges();
-
-        //    }
-        //}
     }
 }

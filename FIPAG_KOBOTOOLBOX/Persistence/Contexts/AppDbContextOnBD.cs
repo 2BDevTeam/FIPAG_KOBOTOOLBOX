@@ -7,13 +7,13 @@ using FIPAG_KOBOTOOLBOX.Extensions;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 {
-    public partial class AppDbContext : DbContext
+    public partial class AppDbContextOnBD : DbContext
     {
-        public AppDbContext()
+        public AppDbContextOnBD()
         {
         }
 
-        public AppDbContext(DbContextOptions<AppDbContext> options)
+        public AppDbContextOnBD(DbContextOptions<AppDbContextOnBD> options)
             : base(options)
         {
         }
@@ -38,7 +38,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DBconnect"));
+            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG"));
         }
 
         public string GetModelNameForTable(string tableName)
@@ -2273,11 +2273,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                 entity.HasIndex(e => e.Nome, "in_cl_nome")
                     .HasFillFactor(70);
 
-                entity.HasIndex(e => e.Rowid, "in_cl_rowid")
-                    .IsUnique()
-                    .IsClustered()
-                    .HasFillFactor(70);
-
                 entity.HasIndex(e => e.Clstamp, "in_cl_stamp")
                     .IsUnique()
                     .HasFillFactor(70);
@@ -2320,7 +2315,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 
                 entity.Property(e => e.Autofact).HasColumnName("autofact");
 
-                entity.Property(e => e.UOrigem).HasColumnName("u_origem");
 
                 entity.Property(e => e.Autorizacaoactiva).HasColumnName("autorizacaoactiva");
 
@@ -3144,10 +3138,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("rota")
                     .HasDefaultValueSql("('')");
 
-                entity.Property(e => e.Rowid)
-                    .HasColumnName("rowid")
-                    .HasDefaultValueSql("(newid())");
-
                 entity.Property(e => e.Saldlet)
                     .HasColumnType("numeric(18, 5)")
                     .HasColumnName("saldlet");
@@ -3333,13 +3323,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 
                 entity.Property(e => e.Txirspersonalizada).HasColumnName("txirspersonalizada");
 
-                entity.Property(e => e.UKoboid)
-                    .HasColumnType("numeric(15, 0)")
-                    .HasColumnName("u_koboid");
-
-                entity.Property(e => e.UKoboOri).HasColumnName("u_koboOri");
-                entity.Property(e => e.UKoboSync).HasColumnName("u_kobosync");
-
+                
                 entity.Property(e => e.UNumetica)
                     .HasColumnType("numeric(10, 0)")
                     .HasColumnName("u_numetica");
@@ -8395,6 +8379,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .IsFixedLength();
 
                 entity.Property(e => e.Adcsepaativa).HasColumnName("adcsepaativa");
+                entity.Property(e => e.UOrigem).HasColumnName("u_origem");
+                entity.Property(e => e.UKoboid)
+                    .HasColumnType("numeric(15, 0)")
+                    .HasColumnName("u_koboid");
+
+                entity.Property(e => e.UKoboOri).HasColumnName("u_koboOri");
+                entity.Property(e => e.UKoboSync).HasColumnName("u_kobosync");
 
                 entity.Property(e => e.Cadmintipo1)
                     .HasMaxLength(10)

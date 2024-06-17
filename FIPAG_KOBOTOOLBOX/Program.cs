@@ -33,24 +33,33 @@ ConversionExtension conversionExtension = new ConversionExtension();
 
 ConfigurationManager configuration = builder.Configuration;
 
-//builder.Services.AddDbContext<SGOFCTX>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect")));
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContextOnBD>(options =>
 {
-    options.UseSqlServer(configuration.GetConnectionString("DBconnect"),
+    options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG"),
 
         sqlServerOptions => sqlServerOptions.CommandTimeout(120));
 });
-builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect")));
+builder.Services.AddDbContext<AppDbContextOnTS>(options =>
+{
+    options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnTS_FIPAG"),
+
+        sqlServerOptions => sqlServerOptions.CommandTimeout(120));
+});
+builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG")));
+builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnTS_FIPAG")));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AuthAppContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<IGenericRepository, GenericRepository>();
+//builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 
-//builder.Services.AddScoped<IPHCRepository, PHCRepository>();
+builder.Services.AddScoped<IGenericRepository<AppDbContextOnBD>, GenericRepository<AppDbContextOnBD>>();
+builder.Services.AddScoped<IGenericRepository<AppDbContextOnTS>, GenericRepository<AppDbContextOnTS>>();
 
-builder.Services.AddScoped<IPHCRepository<AppDbContext>, PHCRepository<AppDbContext>>();
+
+builder.Services.AddScoped<IPHCRepository<AppDbContextOnBD>, PHCRepository<AppDbContextOnBD>>();
+builder.Services.AddScoped<IPHCRepository<AppDbContextOnTS>, PHCRepository<AppDbContextOnTS>>();
 builder.Services.AddScoped<IKoboService, KOBOService>();
 
 builder.Services.AddAuthentication(options =>
@@ -116,7 +125,12 @@ builder.Services.AddInMemoryRateLimiting();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMvcCore().AddApiExplorer();
-builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect"), new SqlServerStorageOptions
+builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect_OnBD_FIPAG"), new SqlServerStorageOptions
+{
+    SchemaName = "SFGOFHANGFIRE",
+
+}));
+builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect_OnTS_FIPAG"), new SqlServerStorageOptions
 {
     SchemaName = "SFGOFHANGFIRE",
 
