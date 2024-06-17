@@ -109,7 +109,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
                 .Join(_appDbContext.Ft2,
-                      joined => joined.Ft.Ftstamp,
+                      joined => joined.Ft.Ftstamp, 
                       ft2 => ft2.Ft2stamp,
                       (joined, ft2) => new { joined.Ft, joined.Cl, joined.Ft3, Ft2 = ft2 })
                 .Where(joined => joined.Cl.UKoboOri == true &&
