@@ -108,10 +108,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                       joined => joined.Ft.Ftstamp,
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
+                .Join(_appDbContext.Ft2,
+                      joined => joined.Ft.Ftstamp,
+                      ft2 => ft2.Ft2stamp,
+                      (joined, ft2) => new { joined.Ft, joined.Cl, joined.Ft3, Ft2 = ft2 })
                 .Where(joined => joined.Cl.UKoboOri == true &&
                                  joined.Ft2.UKobosync == false &&
-                                 joined.Ft.Ndoc == 1
-                                 )
+                                 joined.Ft.Ndoc == 1)
                 .Select(joined => new Consumos
                 {
                     Ftstamp = joined.Ft.Ftstamp,
