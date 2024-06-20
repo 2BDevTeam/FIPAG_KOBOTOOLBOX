@@ -64,12 +64,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         public async Task SyncClientesOBA()
         {
-            int aux = 0;
             try
             {
                 var clsOBA = _phcMainRepository.GetOBAClientes();
                 Debug.Print($"Clientes OBA  {clsOBA.Count}");
 
+                List<Cl2> lstcl2 = new List<Cl2>();
                 foreach (var oBA in clsOBA)
                 {
                     var cl = _phcMainRepository.GetClByNo((int)oBA.PhcId);
@@ -77,7 +77,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     if (cl == null)
                     {
                         Debug.Print($"Cliente com PhcId {oBA.PhcId} não encontrado.");
-
+                         
                         oBA.Error = "Não encontrado no PHC";
                         continue;
                     }
@@ -87,12 +87,13 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     cl2.UKoboOri = true;
                     cl2.UKoboid = (decimal)oBA.KoboId;
 
-                    _genericRepositoryOnBD.SaveChanges();
-                    aux++;
+                    lstcl2.Add(cl2);
+
                     oBA.Sync = true;
                 }
 
-                        Debug.Print($"auxxxxxxxxxxxxxxxx {aux}");
+
+                _genericRepositoryOnBD.BulkUpdate(lstcl2);
                 _genericRepositoryOnBD.BulkUpdate(clsOBA);
                 _genericRepositoryOnBD.SaveChanges();
 
