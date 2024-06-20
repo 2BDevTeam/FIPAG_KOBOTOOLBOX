@@ -236,6 +236,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         {
             return _context.Set<Obaclientes>()
                 .Where(bd => bd.PhcId != 0 && bd.Sync == false)
+                .Take(50)
                .ToList();
         }
 
