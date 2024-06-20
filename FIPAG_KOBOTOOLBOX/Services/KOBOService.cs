@@ -62,12 +62,65 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
+        public async Task SyncClientesOBA()
+        {
+
+            try
+            {
+                var clsOBA = _phcRepositoryOnBD.GetOBAClientes();
+                Debug.Print($"Clientes OBA  {clsOBA.Count}");
+
+                foreach (var oBA in clsOBA)
+                {
+                    var cl = _phcRepositoryOnBD.GetClByNo((int)oBA.PhcId);
+
+                    if (cl == null)
+                    {
+                        Debug.Print($"Cliente com PhcId {oBA.PhcId} não encontrado.");
+
+                        oBA.Error = "Não encontrado no PHC";
+                        continue;
+                    }
+
+                    var cl2 = _phcRepositoryOnBD.GetCl2ByStamp(cl.Clstamp);
+                    cl2.UKoboSync = true;
+                    cl2.UKoboOri = true;
+                    cl2.UKoboid = (decimal)oBA.KoboId;
+
+                    _genericRepositoryOnBD.SaveChanges();
+
+                    oBA.Sync = true;
+                }
+
+                _genericRepositoryOnBD.BulkUpdate(clsOBA);
+                _genericRepositoryOnBD.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"ProcessarFormularios ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "ProcessarFormularios", errorDTO?.ToString());
+            }
+        }
+
+
+
+
+
         public async Task ProcessarFormularios(string nomeBd)
         {
 
             try
             {
                 var bd = _phcRepositoryOnBD.GetBaseDados(nomeBd);
+
+                if (bd == null)
+                {
+                    throw new Exception($"Base de Dados {nomeBd} não encontrada.");
+                }
+
                 Debug.Print($"BDs    {bd.Nomebd}");
 
                 var formularios = _phcRepositoryOnBD.GetLiBaseDados(bd.UBasedadosstamp);
@@ -82,7 +135,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 var aux = _phcDynamicRepository.GetBoTeste(dynamicContext);
 
-                
+
                 foreach (var formulario in formularios)
                 {
                     SincrinizarDadosUSyncQueue(formulario, dynamicContext);
@@ -114,7 +167,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        ProcessFatura(sq,sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -127,7 +180,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueCl)
                     {
-                        ProcessCliente(sq,sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
 
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
@@ -226,7 +279,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             switch (accao)
             {
                 case "UPDATE":
-                    ProcessClienteUpd(usync,stamp, campo, valor, bdStamp, dynamicContext);
+                    ProcessClienteUpd(usync, stamp, campo, valor, bdStamp, dynamicContext);
                     break;
 
                 default:
@@ -241,7 +294,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 case "INSERT":
                     var consumo = _phcDynamicRepository.GetConsumo(dynamicContext, ftstamp);
-                    SyncFactura(usync,consumo, formID, dynamicContext);
+                    SyncFactura(usync, consumo, formID, dynamicContext);
                     break;
 
                 default:

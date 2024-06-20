@@ -127,11 +127,6 @@ builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(
     SchemaName = "SFGOFHANGFIRE",
 
 }));
-builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect_OnTS_FIPAG"), new SqlServerStorageOptions
-{
-    SchemaName = "SFGOFHANGFIRE",
-
-}));
 
 
 //builder.Services.AddControllers(o =>
@@ -167,7 +162,7 @@ app.UseHangfireDashboard("/Jobs");
 // Configure the root path ("/") to return the HTML file
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAuthentication();

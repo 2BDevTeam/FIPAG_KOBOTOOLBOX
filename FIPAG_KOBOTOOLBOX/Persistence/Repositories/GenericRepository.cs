@@ -90,17 +90,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         }
 
-        public void Add<T>(T entity) where T : class
-        {
-            entity.AssignDefaultEntityValues();
-            appDbContext.Add(entity);
-        }
-
-        static bool IsPropertyInList(PropertyInfo searchProperty, List<PropertyInfo> propertyList)
-        {
-            return propertyList.Where(propert=>propert.Name == searchProperty.Name).Any();
-        }
-
         public void UpsertEntity<T>(T entity, List<string> keysToExclude, List<KeyValuePair<string, object>> conditions, bool saveChanges) where T : class
         {
             var entityType = typeof(T);
@@ -257,6 +246,17 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 appDbContext.SaveChanges();
 
             }
+        }
+
+        public void Add<T>(T entity) where T : class
+        {
+            entity.AssignDefaultEntityValues();
+            appDbContext.Add(entity);
+        }
+
+        static bool IsPropertyInList(PropertyInfo searchProperty, List<PropertyInfo> propertyList)
+        {
+            return propertyList.Where(propert=>propert.Name == searchProperty.Name).Any();
         }
 
         public  bool IsPropertySet<T>(T obj, string propertyName)

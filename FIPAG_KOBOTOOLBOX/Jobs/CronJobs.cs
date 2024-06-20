@@ -21,11 +21,20 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "ProcessarFormularios_OnBD_FIPAG",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG"),
               Cron.Minutely());
+            /*
+            RecurringJob.AddOrUpdate(
+               "ProcessarFormularios_OnBD_FIPAG",
+               () => KOBOService.ProcessarFormularios("OnBD_FIPAG"),
+              Cron.Minutely());
+            */
+
+
 
             RecurringJob.AddOrUpdate(
-               "ProcessarFormularios_OnTS_FIPAG",
-               () => KOBOService.ProcessarFormularios("OnTS_FIPAG"),
-              Cron.Minutely());
+               "SincronizarClientesOBA",
+               () => KOBOService.SyncClientesOBA(),
+              Cron.Yearly());
+
 
             /*-------Jobs Temporários para sincronização de beneficiários já existentes no PHC-------*/
             /*
@@ -43,37 +52,6 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
             /*------- FIM -------*/
 
 
-            /*
-            RecurringJob.AddOrUpdate(
-               "AddEmLevantamentoJB_OnBD",
-               () => _koboServiceBD.AdicionarLevantamentoBeneficiarios("OnBD"),
-              Cron.Minutely());
-            */
-
-            /*
-            RecurringJob.AddOrUpdate(
-               "AddEmLevantamentoJB_OnTS",
-               () => koboService.AdicionarLevantamentoBeneficiarios("OnTS"),
-              Cron.Minutely());
-            */
-            /*
-            RecurringJob.AddOrUpdate(
-               "SincrinizarDadosUSyncQueue_OnTS",
-               () => koboService.SincrinizarDadosUSyncQueue("OnTS"),
-              Cron.Minutely());
-            */
-
-            /*
-            RecurringJob.AddOrUpdate(
-             "ProcessarBeira",
-             () => _koboServiceBD.sINCRONIZAR("Beira"),
-            Cron.Minutely(80));
-
-            RecurringJob.AddOrUpdate(
-            "ProcessarChokwe",
-            () => _koboServiceBD.sINCRONIZAR("Chokwe"),
-           Cron.Minutely(60));
-            */
         }
 
     }

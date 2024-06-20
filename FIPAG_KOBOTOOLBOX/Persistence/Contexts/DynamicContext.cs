@@ -15,6 +15,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         }
 
 
+        public virtual DbSet<Obaclientes> Obaclientes { get; set; } = null!;
+
+
+
         public virtual DbSet<Log> Log { get; set; } = null!;
         public virtual DbSet<ApiLogs> ApiLogs { get; set; } = null!;
         public virtual DbSet<UProvider> UProvider { get; set; } = null!;
@@ -407,11 +411,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("ousrinis")
                     .HasDefaultValueSql("('')");
 
-                entity.Property(e => e.UAutdat)
-                    .HasColumnType("datetime")
-                    .HasColumnName("u_autdat")
-                    .HasDefaultValueSql("(CONVERT([datetime],'19000101',0))");
-
                 entity.Property(e => e.UKobosync).HasColumnName("u_kobosync");
 
                 entity.Property(e => e.Usrdata)
@@ -433,6 +432,30 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 
             });
 
+            modelBuilder.Entity<Obaclientes>(entity =>
+            {
+                entity.HasNoKey();
+                entity.Property(e => e.Error)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("error")
+                    .HasDefaultValueSql("('')");
+
+                entity.ToTable("OBAClientes");
+
+                entity.Property(e => e.KoboId).HasColumnName("koboId");
+
+                entity.Property(e => e.KoboNome)
+                    .HasMaxLength(255)
+                    .HasColumnName("koboNome");
+
+                entity.Property(e => e.PhcId).HasColumnName("phcId");
+
+                entity.Property(e => e.PhcNome)
+                    .HasMaxLength(255)
+                    .HasColumnName("phcNome");
+                entity.Property(e => e.Sync).HasColumnName("sync");
+            });
 
             modelBuilder.Entity<Us>(entity =>
             {

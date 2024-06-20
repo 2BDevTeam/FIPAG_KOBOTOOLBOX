@@ -55,7 +55,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                    Nome = joined.Cl.Nome,
                    IDBenefKobo = (int)joined.Cl2.UKoboid,
                    dataLigacao = joined.Cl2.UInicio,
-                   dataTermino= joined.Cl2.UTermino
+                   dataTermino = joined.Cl2.UTermino
                })
                .ToList();
         }
@@ -80,7 +80,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                .FirstOrDefault();
         }
 
-        public Cl2 GetCl2PorIdKobo(int idKobo)
+        public Cl2 GetCl2ByIdKobo(int idKobo)
         {
             return _context.Set<Cl>()
                 .Join(_context.Set<Cl2>(),
@@ -92,7 +92,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 .FirstOrDefault();
         }
 
-        public Cl2 GetCl2PorStamp(string cl2stamp)
+        public Cl2 GetCl2ByStamp(string cl2stamp)
         {
             return _context.Set<Cl2>()
                 .Where(joined => joined.Cl2stamp == cl2stamp)
@@ -229,6 +229,21 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             .Where(f => f.SubNome == nome
                     && f.Basedadosstamp == bdstamp)
             .ToList().FirstOrDefault();
+        }
+
+
+        public List<Obaclientes> GetOBAClientes()
+        {
+            return _context.Set<Obaclientes>()
+                .Where(bd => bd.PhcId != 0 && bd.Sync == false)
+               .ToList();
+        }
+
+
+        public Cl GetClByNo(int no)
+        {
+            return _context.Set<Cl>()
+                .FirstOrDefault(bd => bd.No == no);
         }
 
     }
