@@ -39,14 +39,8 @@ builder.Services.AddDbContext<AppDbContextOnBD>(options =>
 
         sqlServerOptions => sqlServerOptions.CommandTimeout(120));
 });
-builder.Services.AddDbContext<AppDbContextOnTS>(options =>
-{
-    options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnTS_FIPAG"),
-
-        sqlServerOptions => sqlServerOptions.CommandTimeout(120));
-});
 builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG")));
-builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnTS_FIPAG")));
+
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AuthAppContext>()
@@ -55,12 +49,15 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 //builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 
 builder.Services.AddScoped<IGenericRepository<AppDbContextOnBD>, GenericRepository<AppDbContextOnBD>>();
-builder.Services.AddScoped<IGenericRepository<AppDbContextOnTS>, GenericRepository<AppDbContextOnTS>>();
 
 
 builder.Services.AddScoped<IPHCRepository<AppDbContextOnBD>, PHCRepository<AppDbContextOnBD>>();
-builder.Services.AddScoped<IPHCRepository<AppDbContextOnTS>, PHCRepository<AppDbContextOnTS>>();
+builder.Services.AddScoped<IPHCRepository2<DynamicContext>, PHCRepository2<DynamicContext>>();
 builder.Services.AddScoped<IKoboService, KOBOService>();
+builder.Services.AddScoped<ITestService, TestService>();
+
+
+
 
 builder.Services.AddAuthentication(options =>
 {

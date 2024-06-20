@@ -7,21 +7,18 @@ using FIPAG_KOBOTOOLBOX.Extensions;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 {
-    public partial class AppDbContextOnBD : DbContext
+    public partial class DynamicContext : DbContext
     {
-        public AppDbContextOnBD()
+
+        public DynamicContext(DbContextOptions<DynamicContext> options) : base(options)
         {
         }
 
-        public AppDbContextOnBD(DbContextOptions<AppDbContextOnBD> options)
-            : base(options)
-        {
-        }
+
         public virtual DbSet<Log> Log { get; set; } = null!;
         public virtual DbSet<ApiLogs> ApiLogs { get; set; } = null!;
         public virtual DbSet<UProvider> UProvider { get; set; } = null!;
         public virtual DbSet<UFormid> UFormid { get; set; } = null!;
-        public virtual DbSet<UBasedados> UBasedados { get; set; } = null!;
 
         public virtual DbSet<Cl> Cl { get; set; } = null!;
         public virtual DbSet<Cl2> Cl2 { get; set; } = null!;
@@ -32,42 +29,25 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         public virtual DbSet<Ft> Ft { get; set; } = null!;
         public virtual DbSet<Ft3> Ft3 { get; set; } = null!;
         public virtual DbSet<Ft2> Ft2 { get; set; } = null!;
+        public virtual DbSet<UBasedados> UBasedados { get; set; } = null!;
 
         public virtual DbSet<Us> Us { get; set; } = null!;
         public virtual DbSet<USyncQueue> USyncqueue { get; set; } = null!;
         public virtual DbSet<ULibasedado> ULibasedado { get; set; } = null!;
 
+
+        private string _connectionString;
+       
+        public DynamicContext(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            IConfiguration configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json").Build();
-            optionsBuilder.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG"));
-        }
-
-        public string GetModelNameForTable(string tableName)
-        {
-            var entityType = Model.GetEntityTypes()
-             .FirstOrDefault(et => string.Equals(et.GetTableName(), tableName, StringComparison.OrdinalIgnoreCase));
-
-            return entityType?.ClrType.Name ?? "Modelo não encontrado";
-        }
-
-        public string GetPropertyNameForColumn(string tableName, string columnName)
-        {
-            var entityType = Model.GetEntityTypes()
-                .FirstOrDefault(et => string.Equals(et.GetTableName(), tableName, StringComparison.OrdinalIgnoreCase));
-
-            if (entityType == null)
-                return "Tabela não encontrada";
-
-            foreach (var property in entityType.GetProperties())
+            if (!optionsBuilder.IsConfigured)
             {
-                if (string.Equals(property.GetColumnName(), columnName, StringComparison.OrdinalIgnoreCase))
-                {
-                    return property.Name;
-                }
+                optionsBuilder.UseSqlServer(_connectionString);
             }
-
-            return "Coluna não encontrada";
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -237,6 +217,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("usrinis")
                     .HasDefaultValueSql("('')");
             });
+
 
 
             modelBuilder.Entity<UFormid>(entity =>
@@ -2015,13 +1996,15 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .IsUnicode(false)
                     .HasColumnName("usrinis")
                     .HasDefaultValueSql("('')");
-                
+
                 entity.Property(e => e.Zona)
                     .HasMaxLength(20)
                     .IsUnicode(false)
                     .HasColumnName("zona")
                     .HasDefaultValueSql("('')");
             });
+
+
 
             modelBuilder.Entity<Bo2>(entity =>
             {
@@ -3062,7 +3045,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("usrinis")
                     .HasDefaultValueSql("('')");
             });
-
 
             modelBuilder.Entity<Ft>(entity =>
             {
@@ -4238,9 +4220,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
             OnModelCreatingPartial(modelBuilder);
         }
 
+
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
     }
 }
-
-
-//AppDbContext

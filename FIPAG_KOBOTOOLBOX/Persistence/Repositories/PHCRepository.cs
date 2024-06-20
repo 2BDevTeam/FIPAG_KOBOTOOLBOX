@@ -8,7 +8,7 @@ using static System.Net.WebRequestMethods;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class PHCRepository <TContext>: IPHCRepository <TContext> where TContext : DbContext
+    public class PHCRepository<TContext> : IPHCRepository<TContext> where TContext : DbContext
     {
 
         private readonly TContext _context;
@@ -17,7 +17,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         {
             _context = context;
         }
-        
+
+
         public List<Cl> GetClients()
         {
             return _context.Set<Cl>()
@@ -53,51 +54,50 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                    No = (int)joined.Cl.No,
                    Nome = joined.Cl.Nome,
                    IDBenefKobo = (int)joined.Cl2.UKoboid,
-                   dataLigacao = joined.Cl2.UIniciof
+                   dataLigacao = joined.Cl2.UInicio,
+                   dataTermino= joined.Cl2.UTermino
                })
                .ToList();
         }
 
         public Ligacoes GetClNaoSincronizadosLigacoes(string clstamp)
         {
-#pragma warning disable CS8603 // Possible null reference return.
             return _context.Set<Cl2>()
             .Join(_context.Set<Cl>(),
                   cl2 => cl2.Cl2stamp,
                   cl => cl.Clstamp,
                   (cl2, cl) => new { Cl2 = cl2, Cl = cl })
-               .Where(joined => joined.Cl2.UKoboOri == true &&
-                                joined.Cl.Tipo == "1-Activo" &&
-                                joined.Cl2.UKoboSync == false
-                                )
+               .Where(joined => joined.Cl.Clstamp == clstamp)
                .Select(joined => new Ligacoes
                {
                    Clstamp = joined.Cl.Clstamp,
                    No = (int)joined.Cl.No,
                    Nome = joined.Cl.Nome,
                    IDBenefKobo = (int)joined.Cl2.UKoboid,
-                   dataLigacao = joined.Cl2.UIniciof
+                   dataLigacao = joined.Cl2.UInicio,
+                   dataTermino = joined.Cl2.UTermino
                })
                .FirstOrDefault();
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public Cl GetClPorIdKobo(int idKobo)
+        public Cl2 GetCl2PorIdKobo(int idKobo)
         {
-
-#pragma warning disable CS8603 // Possible null reference return.
             return _context.Set<Cl>()
                 .Join(_context.Set<Cl2>(),
                       cl => cl.Clstamp,
                       cl2 => cl2.Cl2stamp,
                       (cl, cl2) => new { Cl = cl, Cl2 = cl2 })
                 .Where(joined => joined.Cl2.UKoboid == idKobo)
-                .Select(joined => joined.Cl)
+                .Select(joined => joined.Cl2)
                 .FirstOrDefault();
-#pragma warning restore CS8603 // Possible null reference return.
-
         }
 
+        public Cl2 GetCl2PorStamp(string cl2stamp)
+        {
+            return _context.Set<Cl2>()
+                .Where(joined => joined.Cl2stamp == cl2stamp)
+                .FirstOrDefault();
+        }
 
         public List<USyncQueue> GetUSyncQueue()
         {
@@ -154,12 +154,11 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         }
 
 
-        public Consumos GetConsumo(string ftstamp )
+        public Consumos GetConsumo(string ftstamp)
         {
             DateTime today = DateTime.Today;
             DateTime specificDate = new DateTime(2024, 5, 27);
 
-#pragma warning disable CS8603 // Possible null reference return.
             return _context.Set<Ft>()
                 .Join(_context.Set<Cl>(),
                       ft => ft.No,
@@ -194,7 +193,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                     Anomalia = joined.Ft3.UAnomal
                 })
                 .FirstOrDefault();
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
 
@@ -205,6 +203,32 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                          .ToList()
                          .DefaultIfEmpty(0)
                          .Max() + 1;
+        }
+
+        public void DeleteLiftqueue(USyncQueue syncQueue)
+        {
+            _context.Set<USyncQueue>().Remove(syncQueue);
+        }
+
+        public UBasedados GetBaseDados(string nomeBd)
+        {
+            return _context.Set<UBasedados>()
+               .FirstOrDefault(bd => bd.Nomebd == nomeBd);
+        }
+
+        public List<ULibasedado> GetLiBaseDados(string Basedadosstamp)
+        {
+            return _context.Set<ULibasedado>()
+                .Where(bd => bd.Basedadosstamp == Basedadosstamp)
+               .ToList();
+        }
+
+        public ULibasedado GetFormID(string nome, string bdstamp)
+        {
+            return _context.Set<ULibasedado>()
+            .Where(f => f.SubNome == nome
+                    && f.Basedadosstamp == bdstamp)
+            .ToList().FirstOrDefault();
         }
 
     }

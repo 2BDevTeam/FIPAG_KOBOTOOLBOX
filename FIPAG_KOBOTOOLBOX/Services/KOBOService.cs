@@ -31,6 +31,8 @@ using Z.EntityFramework.Plus;
 using FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox;
 using FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs;
 using AutoMapper.Features;
+using System.Collections;
+using Microsoft.EntityFrameworkCore;
 
 namespace FIPAG_KOBOTOOLBOX.Services
 {
@@ -42,18 +44,17 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         //private readonly IPHCRepository _PHCRespository;
         private readonly IPHCRepository<AppDbContextOnBD> _phcRepositoryOnBD;
-        private readonly IPHCRepository<AppDbContextOnTS> _phcRepositoryOnTS;
+        private readonly IPHCRepository2<DynamicContext> _phcDynamicRepository;
         private readonly IGenericRepository<AppDbContextOnBD> _genericRepositoryOnBD;
-        private readonly IGenericRepository<AppDbContextOnTS> _genericRepositoryOnTS;
 
-        public KOBOService(IPHCRepository<AppDbContextOnBD> OnBD_Repository, IPHCRepository<AppDbContextOnTS> OnTS_Repository,
-            IGenericRepository<AppDbContextOnBD> genericRepositoryOnBD, IGenericRepository<AppDbContextOnTS> genericRepositoryOnTS)
+        public KOBOService(IPHCRepository<AppDbContextOnBD> OnBD_Repository, IPHCRepository2<DynamicContext> OnTS_Repository,
+            IGenericRepository<AppDbContextOnBD> genericRepositoryOnBD)
         {
             _phcRepositoryOnBD = OnBD_Repository;
-            _phcRepositoryOnTS = OnTS_Repository;
+            _phcDynamicRepository = OnTS_Repository;
             _genericRepositoryOnBD = genericRepositoryOnBD;
-            _genericRepositoryOnTS = genericRepositoryOnTS;
         }
+
 
         public KOBOService()
         {
@@ -61,50 +62,119 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-
-        public async Task GetNrCl()
-        {
-
-            /*
-             * 
-            var ligacoes = _phcRepositoryOnTS.GetClients();
-
-            Debug.Print($"TOTAL DE CLIENTES ON TS {ligacoes.Count()}");
-
-            ligacoes = _phcRepositoryOnBD.GetClients();
-            Debug.Print($"TOTAL DE CLIENTES ON BD {ligacoes.Count()}");
-
-            foreach (var li in ligacoes)
-            {
-                //RegistarCliente(li.IDBenefKobo);
-                //SyncLigacao(li);
-            }
-
-            */
-        }
-
-
-
-        public async Task AdicionarLevantamentoBeneficiarios(string DB)
+        public async Task ProcessarFormularios(string nomeBd)
         {
 
             try
             {
-                var dados = koboAPI.GetFormNaoAdicionadosPHC();
+                var bd = _phcRepositoryOnBD.GetBaseDados(nomeBd);
+                Debug.Print($"BDs    {bd.Nomebd}");
+
+                var formularios = _phcRepositoryOnBD.GetLiBaseDados(bd.UBasedadosstamp);
+
+                var connectionString = $"Server={bd.Nomesrv.Trim()};Database={bd.Nomebd.Trim()};User Id={bd.Username.Trim()};Password={bd.Password.Trim()};Trusted_Connection=False;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False";
+                Debug.Print($"Connectiosn   {connectionString}");
+
+
+                var dynamicContext = new DynamicContext(connectionString);
+
+
+
+                var aux = _phcDynamicRepository.GetBoTeste(dynamicContext);
+
+                
+                foreach (var formulario in formularios)
+                {
+                    SincrinizarDadosUSyncQueue(formulario, dynamicContext);
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"ProcessarFormularios ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "ProcessarFormularios", errorDTO?.ToString());
+            }
+
+        }
+
+
+        public async Task SincrinizarDadosUSyncQueue(ULibasedado formulario, DynamicContext dynamicContext)
+        {
+            Debug.Print($"SincrinizarDadosUSyncQueue    {formulario.SubNome}");
+
+            switch (formulario.SubNome)
+            {
+
+                case "Consumo":
+                    var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
+                    Debug.Print($"TOTAL DE Consumos DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueFt.Count()}");
+
+                    foreach (var sq in syncQueueFt)
+                    {
+                        ProcessFatura(sq,sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                    }
+                    _phcDynamicRepository.SaveChanges(dynamicContext);
+
+                    break;
+
+                case "Ligação":
+
+                    var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
+                    Debug.Print($"TOTAL DE Ligações DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueCl.Count()}");
+
+                    foreach (var sq in syncQueueCl)
+                    {
+                        ProcessCliente(sq,sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+
+                    }
+                    _phcDynamicRepository.SaveChanges(dynamicContext);
+
+                    break;
+
+                case "Levantamento":
+
+                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+
+                    break;
+
+                default: break;
+
+            }
+
+        }
+
+
+
+        public void AdicionarLevantamentoBeneficiarios(string formID, DynamicContext dynamicContext)
+        {
+
+            try
+            {
+                var dados = koboAPI.GetFormNaoAdicionadosPHC(formID);
+
+
                 if (dados == null)
                 {
+                    throw new Exception($"Null em {formID}");
+                }
 
-                    throw new Exception("Dados do Kobo retornaram Null");
+                if (dados.results.Count == 0)
+                {
+                    throw new Exception($"Sem dados em {formID}");
                 }
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
-                var emNo = Sw_GetEmNo(DB);
+                var emNo = _phcDynamicRepository.GetNoEm(dynamicContext);
 
                 foreach (var dado in dados.results)
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
-                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id).results;
+
+                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
 
                     var em = new Em
                     {
@@ -135,11 +205,11 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Usrhora = DateTime.Now.ToString("HH:mm")
                     };
 
-                    Sw_Add(DB, em);
+                    _phcDynamicRepository.Add(dynamicContext, em);
                     emNo++;
                 }
 
-                Sw_SaveChanges(DB);
+                _phcDynamicRepository.SaveChanges(dynamicContext);
 
             }
             catch (Exception ex)
@@ -147,89 +217,16 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 Debug.Print($"ERRO AO AdicionarLevantamentoBeneficiarios {ex.Message}");
             }
 
-
-        }
-
-        /*
-
-        public async Task AdicionarLigacoesDeCls()
-        {
-            var ligacoes = _PHCRespository.GetClNaoSincronizadosLigacoes();
-            Debug.Print($"TOTAL DE CLIENTES LICAÇÃO POR SINCRONIZAR {ligacoes.Count()}");
-
-            foreach (var li in ligacoes)
-            {
-                //RegistarCliente(li.IDBenefKobo);
-                SyncLigacao(li);
-            }
         }
 
 
-        public async Task SincronizarFt()
-        {
-
-            var consumos = _PHCRespository.GetConsumos();
-            Debug.Print($"TOTAL DE FATURAS POR SINCRONIZAR {consumos.Count()}");
-
-            foreach (var consumo in consumos)
-            {
-                Debug.Print("fttttttttt " + consumo.Ftstamp);
-                BackgroundJob.Enqueue(() => SyncFactura(consumo));
-
-            }
-
-        }
-
-        public async Task SincrinizarDadosUSyncQueue()
-        {
-
-            var syncQueue = _PHCRespository.GetUSyncQueue();
-            Debug.Print($"TOTAL DE registos POR SINCRONIZAR {syncQueue.Count()}");
-
-            foreach (var sq in syncQueue)
-            {
-
-                switch (sq.Nometabela)
-                {
-                    case "cl":
-                        ProcessCliente(sq.Stamptabela, sq.Accao, sq.campo, sq.valor);
-
-                        break;
-                    case "ft":
-                        ProcessFatura(sq.Stamptabela, sq.Accao);
-
-                        break;
-                    default:
-                        break;
-                }
-
-            }
-
-        }
-
-
-        public void ProcessFatura(string stamp, string accao)
-        {
-
-            switch (accao)
-            {
-                case "INSERT":
-                    var consumo = _PHCRespository.GetConsumo(stamp);
-                    SyncFactura(consumo);
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        public void ProcessCliente(string stamp, string accao, string campo, string valor)
+        public void ProcessCliente(USyncQueue usync, string stamp, string accao, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
         {
 
             switch (accao)
             {
                 case "UPDATE":
-                    ProcessClienteUpd(stamp, campo, valor);
+                    ProcessClienteUpd(usync,stamp, campo, valor, bdStamp, dynamicContext);
                     break;
 
                 default:
@@ -237,23 +234,41 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
         }
 
-        public void ProcessClienteUpd(string stamp, string campo, string valor)
+        public void ProcessFatura(USyncQueue usync, string ftstamp, string accao, string formID, DynamicContext dynamicContext)
         {
+
+            switch (accao)
+            {
+                case "INSERT":
+                    var consumo = _phcDynamicRepository.GetConsumo(dynamicContext, ftstamp);
+                    SyncFactura(usync,consumo, formID, dynamicContext);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+
+
+        public void ProcessClienteUpd(USyncQueue usync, string stamp, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
+        {
+            Debug.Print($"ProcessClienteUpd ");
+            //var cl2 = _phcDynamicRepository.GetCl2PorStamp(dynamicContext, stamp);
 
             switch (campo)
             {
                 case "tipo":
-                    
+                    var li = _phcDynamicRepository.GetClNaoSincronizadosLigacoes(dynamicContext, stamp);
+
                     if (valor == "1-Activo")
                     {
-                        var li = _PHCRespository.GetClNaoSincronizadosLigacoes(stamp);
-                        SyncLigacao(li);
-
+                        SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
                     }
                     else if (valor == "2-Suspenso" || valor == "3-Rescindido")
                     {
-
-
+                        li.dataLigacao = li.dataTermino;
+                        SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
                     }
 
                     break;
@@ -265,7 +280,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-        public void SyncFactura(Consumos cons)
+        public void SyncFactura(USyncQueue usync, Consumos cons, string formID, DynamicContext dynamicContext)
         {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset localTime = now.ToOffset(TimeSpan.FromHours(2));
@@ -324,18 +339,19 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
 
-                var insertFt = koboAPI.AddDataToKobo(body, "Consumos");
+                var insertFt = koboAPI.AddDataToKobo(body, formID);
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
                 {
                     throw new Exception("Erro a introduzir a fatura no KoboToolbox.");
                 }
 
-                var ft2 = _PHCRespository.GetFt2(cons.Ftstamp);
-
+                var ft2 = _phcDynamicRepository.GetFt2(dynamicContext, cons.Ftstamp);
                 ft2.UKobosync = true;
 
-                _genericRepository.SaveChanges();
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+
+                _phcDynamicRepository.SaveChanges(dynamicContext);
 
             }
             catch (Exception ex)
@@ -348,7 +364,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public void SyncLigacao(Ligacoes lig)
+        public void SyncLigacao(USyncQueue usync, Ligacoes lig, string estado, string stampBD, DynamicContext dynamicContext)
         {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset localTime = now.ToOffset(TimeSpan.FromHours(2));
@@ -375,9 +391,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         {
                             no = (int)lig.No,
                             nome = lig.Nome,
-                            DataLigacao = lig.dataLigacao.ToString("yyyy-MM-dd") + "T00:00:00+02:00",
+                            DataLigacao = lig.dataLigacao.ToString("yyyy-MM-dd"),
                             IDBenefKobo = lig.IDBenefKobo,
-                            EstadoLigacao = "1-Activo"
+                            EstadoLigacao = estado
                         }
                     }
                 };
@@ -391,21 +407,26 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
 
-                var insertFt = koboAPI.AddDataToKobo(body, "Ligações");
+                var formID = _phcRepositoryOnBD.GetFormID("Ligação", stampBD);
+                Debug.Print($"stampBD {stampBD}");
+
+                var insertFt = koboAPI.AddDataToKobo(body, formID.Formid);
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
                 {
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
                 }
 
-                var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo);
+                formID = _phcRepositoryOnBD.GetFormID("Levantamento", stampBD);
+                var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
 
+                var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
 
-                var cliente = _PHCRespository.GetClPorIdKobo(lig.IDBenefKobo);
                 cliente.UKoboSync = true;
 
-                _genericRepository.SaveChanges();
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
 
+                _phcDynamicRepository.SaveChanges(dynamicContext);
             }
             catch (Exception ex)
             {
@@ -425,6 +446,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             try
             {
                 //var updBeneficiario = koboAPI.UpdEstadoLigacao(lig.IDBenefKobo);
+
             }
             catch (Exception ex)
             {
@@ -439,19 +461,24 @@ namespace FIPAG_KOBOTOOLBOX.Services
         public ResponseDTO GetResult(string nome)
         {
             var responseID = logHelper.generateResponseID();
+
+
             var response = koboAPI.GetResult(nome);
 
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
         }
 
 
-        public ResponseDTO RegistarCliente(int id)
+        /*
+        public ResponseDTO RegistarCliente(int id, string DB)
         {
-            var cliente = _PHCRespository.GetClPorIdKobo(id);
+
+            var cliente = Sw_GetCl2IdKobo(id, DB);
 
             var responseID = logHelper.generateResponseID();
-            //var response2 = koboAPI.UpdIsClientePHC(id);
-            var response = koboAPI.UpdIsClientePHC(id);
+
+            var formID = Sw_GetUFormId("Levantamento de", DB);
+            var response = koboAPI.UpdIsClientePHC(id, formID.Formid);
 
             //try
 
@@ -459,64 +486,16 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 cliente.UKoboSync = true;
                 cliente.UOrigem = "KoboToolbox";
-                _genericRepository.SaveChanges();
+                Sw_SaveChanges(DB);
             }
 
 
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
         }
-
-
         */
 
-        decimal Sw_GetEmNo(string DBname)
-        {
-            decimal val = (decimal)0;
 
-            switch (DBname)
-            {
-                case "OnBD":
-                    val = _phcRepositoryOnBD.GetNoEm();
-                    break;
-                case "OnTS":
-                    val = _phcRepositoryOnTS.GetNoEm();
-                    break;
-                default:
-                    break;
-            }
 
-            return val;
-        }
-
-        void Sw_SaveChanges(string DBname)
-        {
-            switch (DBname)
-            {
-                case "OnBD":
-                    _genericRepositoryOnBD.SaveChanges();
-                    break;
-                case "OnTS":
-                    _genericRepositoryOnTS.SaveChanges();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void Sw_Add(string DBname, object obj)
-        {
-            switch (DBname)
-            {
-                case "OnBD":
-                    _genericRepositoryOnBD.Add(obj);
-                    break;
-                case "OnTS":
-                    _genericRepositoryOnTS.Add(obj);
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
 }

@@ -76,9 +76,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdNaoAdicionadosPHC(int id)
+        public UpdateResponseDTO UpdNaoAdicionadosPHC(int id, string formID)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
+            //string formID = "aj3EiDTv5DmsrxsPEGwi28";
             try
             {
                 string result = "";
@@ -156,9 +156,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdIsClientePHC(int id)
+        public UpdateResponseDTO UpdIsClientePHC(int id, string formID)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
             try
             {
                 string result = "";
@@ -236,9 +235,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdEstadoLigacao(int id, string estado)
+
+
+        public UpdateResponseDTO UpdEstadoLigacao(int id, string estado, string formID)
         {
-            string formID = "aRGAdMpcPyV8dgjnisTatW";
+
+
+            //string formID = "aRGAdMpcPyV8dgjnisTatW";
             try
             {
                 string result = "";
@@ -376,47 +379,36 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
         }
 
 
-        public ResultsResponseDTO GetFormNaoAdicionadosPHC()
+        public ResultsResponseDTO GetFormNaoAdicionadosPHC(string formID)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
+
             int limit = 100;
             int start = 0;
-            List<ResultsDTO> allResults = new List<ResultsDTO>();
 
             try
             {
-                while (true)
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
+                    200,
+                    "assets",
+                    $"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
+                );
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
-                    string result = "";
-
-                    HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
-                        200,
-                        "assets",
-                        $"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
-                    );
-
-                    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                    {
-                        result = streamReader.ReadToEnd();
-                    }
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                    };
-
-                    ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
-                    if (results.results == null || results.results.Count == 0)
-                    {
-                        break;
-                    }
-
-                    allResults.AddRange(results.results);
-                    start += limit;
+                    result = streamReader.ReadToEnd();
                 }
 
-                return new ResultsResponseDTO { results = allResults };
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
+
+                return results;
             }
             catch (WebException ex)
             {
@@ -447,9 +439,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
 
 
 
-        public InsertResponseDTO AddDataToKobo (InsertFormDTO body, string form)
+        public InsertResponseDTO AddDataToKobo(InsertFormDTO body, string formID)
         {
-            string formID = _koboToolBoxHelper.GetKoboFormID(form);
 
             try
             {
@@ -550,7 +541,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        
+
     }
 }
 

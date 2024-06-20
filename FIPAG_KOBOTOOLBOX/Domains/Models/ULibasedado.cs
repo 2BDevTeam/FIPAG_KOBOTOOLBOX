@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace FIPAG_KOBOTOOLBOX.Domains.Models
 {
-    public partial class Ft2
+    public partial class ULibasedado
     {
-        public string Ft2stamp { get; set; } = null!;
-        
-        public DateTime UAutdat { get; set; }
+        public string ULibasedadostamp { get; set; } = null!;
+        public string Nome { get; set; } = null!;
+        public string SubNome { get; set; } = null!;
+        public string Formid { get; set; } = null!;
+        public string Basedadosstamp { get; set; } = null!;
         public string Ousrinis { get; set; } = null!;
         public DateTime Ousrdata { get; set; }
         public string Ousrhora { get; set; } = null!;
@@ -15,6 +17,5 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public DateTime Usrdata { get; set; }
         public string Usrhora { get; set; } = null!;
         public bool Marcada { get; set; }
-        public bool UKobosync { get; set; }
     }
 }
