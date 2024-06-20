@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/FIPAG_KOBOTOOLBOX/appsettings.Development.json
+/FIPAG_KOBOTOOLBOX/appsettings.json
