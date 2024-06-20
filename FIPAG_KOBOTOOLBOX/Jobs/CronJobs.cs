@@ -34,12 +34,12 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "SincronizarClientesOBA",
                () => KOBOService.SyncClientesOBA(),
               Cron.Yearly());
-
+            /*
             RecurringJob.AddOrUpdate(
                "SincronizarFt",
                () => KOBOService.SincronizarFt(),
               Cron.Minutely());
-
+            */
             /*-------Jobs Temporários para sincronização de beneficiários já existentes no PHC-------*/
             /*
             RecurringJob.AddOrUpdate(
