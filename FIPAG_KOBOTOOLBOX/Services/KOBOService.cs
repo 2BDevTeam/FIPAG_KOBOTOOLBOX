@@ -64,7 +64,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         public async Task SyncClientesOBA()
         {
-
+            int aux = 0;
             try
             {
                 var clsOBA = _phcMainRepository.GetOBAClientes();
@@ -87,16 +87,14 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     cl2.UKoboOri = true;
                     cl2.UKoboid = (decimal)oBA.KoboId;
 
-
-                    cl.Nome2 = cl.Nome2;
-
                     _genericRepositoryOnBD.SaveChanges();
-
+                    aux++;
                     oBA.Sync = true;
                 }
 
                 _genericRepositoryOnBD.BulkUpdate(clsOBA);
                 _genericRepositoryOnBD.SaveChanges();
+                        Debug.Print($"auxxxxxxxxxxxxxxxx {aux}");
 
             }
             catch (Exception ex)
