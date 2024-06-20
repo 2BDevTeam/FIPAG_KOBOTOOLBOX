@@ -92,9 +92,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     oBA.Sync = true;
                 }
 
+                        Debug.Print($"auxxxxxxxxxxxxxxxx {aux}");
                 _genericRepositoryOnBD.BulkUpdate(clsOBA);
                 _genericRepositoryOnBD.SaveChanges();
-                        Debug.Print($"auxxxxxxxxxxxxxxxx {aux}");
 
             }
             catch (Exception ex)
