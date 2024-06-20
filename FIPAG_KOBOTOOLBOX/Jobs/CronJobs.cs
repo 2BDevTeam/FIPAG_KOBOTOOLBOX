@@ -16,6 +16,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
         public void JobHandler()
         {
+            
 
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG",
