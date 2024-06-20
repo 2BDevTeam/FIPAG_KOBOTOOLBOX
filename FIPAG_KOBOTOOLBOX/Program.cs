@@ -33,7 +33,7 @@ ConversionExtension conversionExtension = new ConversionExtension();
 
 ConfigurationManager configuration = builder.Configuration;
 
-builder.Services.AddDbContext<AppDbContextOnBD>(options =>
+builder.Services.AddDbContext<AppDbContextMain>(options =>
 {
     options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG"),
 
@@ -48,10 +48,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 
 //builder.Services.AddScoped<IGenericRepository, GenericRepository>();
 
-builder.Services.AddScoped<IGenericRepository<AppDbContextOnBD>, GenericRepository<AppDbContextOnBD>>();
+builder.Services.AddScoped<IGenericRepository<AppDbContextMain>, GenericRepository<AppDbContextMain>>();
 
 
-builder.Services.AddScoped<IPHCRepository<AppDbContextOnBD>, PHCRepository<AppDbContextOnBD>>();
+builder.Services.AddScoped<IPHCMainRepository<AppDbContextMain>, PHCRepository<AppDbContextMain>>();
 builder.Services.AddScoped<IPHCRepository2<DynamicContext>, PHCRepository2<DynamicContext>>();
 builder.Services.AddScoped<IKoboService, KOBOService>();
 builder.Services.AddScoped<ITestService, TestService>();

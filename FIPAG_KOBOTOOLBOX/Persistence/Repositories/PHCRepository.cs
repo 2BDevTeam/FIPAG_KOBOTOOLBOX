@@ -8,7 +8,7 @@ using static System.Net.WebRequestMethods;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class PHCRepository<TContext> : IPHCRepository<TContext> where TContext : DbContext
+    public class PHCRepository<TContext> : IPHCMainRepository<TContext> where TContext : DbContext
     {
 
         private readonly TContext _context;

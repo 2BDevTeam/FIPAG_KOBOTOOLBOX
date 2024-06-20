@@ -64,7 +64,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
         public void GenerateApiLogJB(ResponseDTO response, string requestId, string operation, string responseText)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextOnBD>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -77,7 +77,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
 
-            using (AppDbContextOnBD context = new AppDbContextOnBD(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
 
                 ApiLogs apiLogs = new ApiLogs { Code = response?.response?.cod, RequestId = requestId, ResponseDesc = response?.response?.codDesc, Data = DateTime.Now, Content = response?.Content?.ToString(), Operation = operation, ResponseText = responseText };
@@ -102,7 +102,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
         public void generateLogJB(ResponseDTO response, string requestId, string operation)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextOnBD>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -115,7 +115,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
 
-            using (AppDbContextOnBD context = new AppDbContextOnBD(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
                // var codeLogable = logabbleCodes.Where(loggable => loggable?.cod == response?.response?.cod).Count();
 
@@ -151,7 +151,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
         }
         public void generateResponseLogJB(ResponseDTO response, string requestId, string operation,string responseText)
         {
-                var optionsBuilder = new DbContextOptionsBuilder<AppDbContextOnBD>();
+                var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
                 var configuration = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
                .AddJsonFile($"appsettings.json");
@@ -164,7 +164,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
 
-                using (AppDbContextOnBD context = new AppDbContextOnBD(optionsBuilder.Options))
+                using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
                 {
                     
                     Log Log = new Log { Code = response?.response?.cod, RequestId = requestId, ResponseDesc = response?.response?.codDesc, Data = DateTime.Now, Content = response?.Content?.ToString(), Operation = operation,ResponseText=responseText };

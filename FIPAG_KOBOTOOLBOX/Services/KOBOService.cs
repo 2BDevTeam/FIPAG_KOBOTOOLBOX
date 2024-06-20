@@ -43,14 +43,14 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
         //private readonly IPHCRepository _PHCRespository;
-        private readonly IPHCRepository<AppDbContextOnBD> _phcRepositoryOnBD;
+        private readonly IPHCMainRepository<AppDbContextMain> _phcMainRepository;
         private readonly IPHCRepository2<DynamicContext> _phcDynamicRepository;
-        private readonly IGenericRepository<AppDbContextOnBD> _genericRepositoryOnBD;
+        private readonly IGenericRepository<AppDbContextMain> _genericRepositoryOnBD;
 
-        public KOBOService(IPHCRepository<AppDbContextOnBD> OnBD_Repository, IPHCRepository2<DynamicContext> OnTS_Repository,
-            IGenericRepository<AppDbContextOnBD> genericRepositoryOnBD)
+        public KOBOService(IPHCMainRepository<AppDbContextMain> Main_Repository, IPHCRepository2<DynamicContext> OnTS_Repository,
+            IGenericRepository<AppDbContextMain> genericRepositoryOnBD)
         {
-            _phcRepositoryOnBD = OnBD_Repository;
+            _phcMainRepository = Main_Repository;
             _phcDynamicRepository = OnTS_Repository;
             _genericRepositoryOnBD = genericRepositoryOnBD;
         }
@@ -67,12 +67,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             try
             {
-                var clsOBA = _phcRepositoryOnBD.GetOBAClientes();
+                var clsOBA = _phcMainRepository.GetOBAClientes();
                 Debug.Print($"Clientes OBA  {clsOBA.Count}");
 
                 foreach (var oBA in clsOBA)
                 {
-                    var cl = _phcRepositoryOnBD.GetClByNo((int)oBA.PhcId);
+                    var cl = _phcMainRepository.GetClByNo((int)oBA.PhcId);
 
                     if (cl == null)
                     {
@@ -82,10 +82,13 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         continue;
                     }
 
-                    var cl2 = _phcRepositoryOnBD.GetCl2ByStamp(cl.Clstamp);
+                    var cl2 = _phcMainRepository.GetCl2ByStamp(cl.Clstamp);
                     cl2.UKoboSync = true;
                     cl2.UKoboOri = true;
                     cl2.UKoboid = (decimal)oBA.KoboId;
+
+
+                    cl.Nome2 = cl.Nome2;
 
                     _genericRepositoryOnBD.SaveChanges();
 
@@ -106,6 +109,20 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
+        public async Task SincronizarFt()
+        {
+
+            var consumos = _phcMainRepository.GetConsumos();
+            Debug.Print($"TOTAL DE FATURAS POR SINCRONIZAR {consumos.Count()}");
+
+            foreach (var consumo in consumos)
+            {
+                //Debug.Print("fttttttttt " + consumo.Ftstamp);
+                //BackgroundJob.Enqueue(() => SyncFactura(consumo));
+
+            }
+
+        }
 
 
 
@@ -114,7 +131,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             try
             {
-                var bd = _phcRepositoryOnBD.GetBaseDados(nomeBd);
+                var bd = _phcMainRepository.GetBaseDados(nomeBd);
 
                 if (bd == null)
                 {
@@ -123,7 +140,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 Debug.Print($"BDs    {bd.Nomebd}");
 
-                var formularios = _phcRepositoryOnBD.GetLiBaseDados(bd.UBasedadosstamp);
+                var formularios = _phcMainRepository.GetLiBaseDados(bd.UBasedadosstamp);
 
                 var connectionString = $"Server={bd.Nomesrv.Trim()};Database={bd.Nomebd.Trim()};User Id={bd.Username.Trim()};Password={bd.Password.Trim()};Trusted_Connection=False;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False";
                 Debug.Print($"Connectiosn   {connectionString}");
@@ -460,7 +477,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
 
-                var formID = _phcRepositoryOnBD.GetFormID("Ligação", stampBD);
+                var formID = _phcMainRepository.GetFormID("Ligação", stampBD);
                 Debug.Print($"stampBD {stampBD}");
 
                 var insertFt = koboAPI.AddDataToKobo(body, formID.Formid);
@@ -470,7 +487,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
                 }
 
-                formID = _phcRepositoryOnBD.GetFormID("Levantamento", stampBD);
+                formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
                 var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
 
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);

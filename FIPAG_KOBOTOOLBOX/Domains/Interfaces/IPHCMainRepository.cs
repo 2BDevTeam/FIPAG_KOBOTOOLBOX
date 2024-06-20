@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
 {
-    public interface IPHCRepository <TContext> where TContext : DbContext
+    public interface IPHCMainRepository <TContext> where TContext : DbContext
     {
         public List<Obaclientes> GetOBAClientes();
 

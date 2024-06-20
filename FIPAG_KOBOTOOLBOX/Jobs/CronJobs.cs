@@ -35,6 +35,10 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                () => KOBOService.SyncClientesOBA(),
               Cron.Yearly());
 
+            RecurringJob.AddOrUpdate(
+               "SincronizarFt",
+               () => KOBOService.SincronizarFt(),
+              Cron.Minutely());
 
             /*-------Jobs Temporários para sincronização de beneficiários já existentes no PHC-------*/
             /*
@@ -44,10 +48,6 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
               Cron.Minutely());
 
 
-            RecurringJob.AddOrUpdate(
-               "SincronizarFt",
-               () => koboService.SincronizarFt("OnBD"),
-              Cron.Minutely());
             */
             /*------- FIM -------*/
 

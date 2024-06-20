@@ -7,13 +7,13 @@ using FIPAG_KOBOTOOLBOX.Extensions;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 {
-    public partial class AppDbContextOnBD : DbContext
+    public partial class AppDbContextMain : DbContext
     {
-        public AppDbContextOnBD()
+        public AppDbContextMain()
         {
         }
 
-        public AppDbContextOnBD(DbContextOptions<AppDbContextOnBD> options)
+        public AppDbContextMain(DbContextOptions<AppDbContextMain> options)
             : base(options)
         {
         }

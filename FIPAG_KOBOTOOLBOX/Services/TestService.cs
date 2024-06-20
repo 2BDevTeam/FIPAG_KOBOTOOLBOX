@@ -43,9 +43,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
         //private readonly IPHCRepository _PHCRespository;
-        private readonly IPHCRepository<AppDbContextOnBD> _phcRepositoryOnBD;
+        private readonly IPHCMainRepository<AppDbContextMain> _phcRepositoryOnBD;
 
-        public TestService(IPHCRepository<AppDbContextOnBD> OnBD_Repository)
+        public TestService(IPHCMainRepository<AppDbContextMain> OnBD_Repository)
         {
             _phcRepositoryOnBD = OnBD_Repository;
         }

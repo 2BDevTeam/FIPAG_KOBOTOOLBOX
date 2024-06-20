@@ -8,7 +8,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
     {
         public List<UProvider> getProviderData(decimal providerCode)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextOnBD>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -21,7 +21,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
 
-            using (AppDbContextOnBD context = new AppDbContextOnBD(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
 
                 return context.UProvider.Where(provider => provider.codigo == providerCode).ToList();
@@ -29,7 +29,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
         }
         public List<UProvider> getProviderByGroup(decimal providerCode,string grupo)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextOnBD>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -42,7 +42,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
 
-            using (AppDbContextOnBD context = new AppDbContextOnBD(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
 
                 return context.UProvider.Where(provider => provider.codigo == providerCode &&provider.grupo==grupo).ToList();
