@@ -434,16 +434,18 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
 
             modelBuilder.Entity<Obaclientes>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.KoboId)
+                    .HasName("PK_OBAClientes_KoboId");
+
+                entity.ToTable("OBAClientes");
+
+                entity.Property(e => e.KoboId).HasColumnName("koboId");
+
                 entity.Property(e => e.Error)
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("error")
                     .HasDefaultValueSql("('')");
-
-                entity.ToTable("OBAClientes");
-
-                entity.Property(e => e.KoboId).HasColumnName("koboId");
 
                 entity.Property(e => e.KoboNome)
                     .HasMaxLength(255)
@@ -454,6 +456,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                 entity.Property(e => e.PhcNome)
                     .HasMaxLength(255)
                     .HasColumnName("phcNome");
+
                 entity.Property(e => e.Sync).HasColumnName("sync");
             });
 
