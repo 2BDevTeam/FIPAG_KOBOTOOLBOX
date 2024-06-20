@@ -108,8 +108,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         public List<Consumos> GetConsumos()
         {
-            DateTime today = DateTime.Today;
-            DateTime specificDate = new DateTime(2024, 5, 27);
+            //DateTime today = DateTime.Today;
+            //DateTime specificDate = new DateTime(2024, 5, 27);
 
             return _context.Set<Ft>()
                 .Join(_context.Set<Cl>(),

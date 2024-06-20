@@ -116,11 +116,93 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             foreach (var consumo in consumos)
             {
-                //Debug.Print("fttttttttt " + consumo.Ftstamp);
-                //BackgroundJob.Enqueue(() => SyncFactura(consumo));
+                Debug.Print("fttttttttt " + consumo.Ftstamp);
+                BackgroundJob.Enqueue(() => SyncFactura(consumo));
 
             }
 
+        }
+
+        public void SyncFactura(Consumos cons)
+        {
+            DateTimeOffset now = DateTimeOffset.Now;
+            DateTimeOffset localTime = now.ToOffset(TimeSpan.FromHours(2));
+            string formattedDate = localTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+            try
+            {
+                var data = cons.Fdata.ToString("yyyy-MM-dd") + "T00:00:00+02:00";
+
+                InsertFormDTO body = new()
+                {
+                    id = "",
+                    submission = new SubmissionDataDTO
+                    {
+                        meta = new MetaDataDTO
+                        {
+                            instanceID = "uuid:2BPHCadmin"
+                        },
+                        start = formattedDate,
+                        end = formattedDate,
+                        today = formattedDate,
+                        username = "PHC",
+
+                        Group1Consumos = new Group1Consumos
+                        {
+                            no = cons.No,
+                            nome = cons.Nome.Trim(),
+                            IDBenefKobo = cons.IDBenefKobo
+                        },
+                        Group2Consumos = new Group2Consumos
+                        {
+                            nmdoc = cons.Nmdoc,
+                            fno = cons.Fno,
+                            totalMeticais = cons.TotalMeticais,
+                            fdata = data
+                        },
+                        Group3Consumos = new Group3Consumos
+                        {
+                            tipoFatura = cons.TipoFatura,
+                            periodo = cons.Periodo,
+                            leituraAnterior = cons.LeituraAnterior,
+                            leituraActual = cons.LeituraActual,
+                            consumoFaturado = cons.ConsumoFaturado,
+                            consumoReal = cons.ConsumoReal,
+                            anomalia = cons.Anomalia
+                        }
+                    }
+                };
+
+                string json = JsonConvert.SerializeObject(body);
+
+                JObject jsonObject = JObject.Parse(json);
+                koboAPI.RemoveNullProperties(jsonObject);
+
+
+                string cleanedJson = jsonObject.ToString(Formatting.None);
+                Debug.Print($"Json limpo Fatura {cleanedJson}");
+
+                var insertFt = koboAPI.AddDataToKobo(body, "Consumos");
+
+                if (insertFt == null || insertFt.message != "Successful submission.")
+                {
+                    throw new Exception("Erro a introduzir a fatura no KoboToolbox.");
+                }
+
+                var ft2 = _phcMainRepository.GetFt2(cons.Ftstamp);
+
+                ft2.UKobosync = true;
+
+                _genericRepositoryOnBD.SaveChanges();
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"SyncFactura ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncFactura", errorDTO?.ToString());
+            }
         }
 
 
@@ -485,9 +567,11 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
                 }
+                
 
-                formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
-                var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                /**** REMOVIDO DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
+                //formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
+                //var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
 
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
 
