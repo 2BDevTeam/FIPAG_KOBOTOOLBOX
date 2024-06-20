@@ -258,7 +258,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             switch (formulario.SubNome)
             {
-
+                /*
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
                     Debug.Print($"TOTAL DE Consumos DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueFt.Count()}");
@@ -271,6 +271,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     break;
 
+                    */
                 case "Ligação":
 
                     var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
