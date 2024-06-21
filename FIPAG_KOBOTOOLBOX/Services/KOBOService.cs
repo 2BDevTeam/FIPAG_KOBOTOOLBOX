@@ -63,7 +63,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-        public void SincronizarFt(string formId)
+        public void SincronizarFtOBA(string formId)
         {
 
             var consumos = _phcMainRepository.GetConsumos();
@@ -72,7 +72,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             foreach (var consumo in consumos)
             {
                 Debug.Print("fttttttttt " + consumo.Ftstamp);
-                BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
+                //BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
 
             }
 
@@ -167,12 +167,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             try
             {
-                var bd = _phcMainRepository.GetBaseDados(nomeBd);
-
-                if (bd == null)
-                {
-                    throw new Exception($"Base de Dados {nomeBd} não encontrada.");
-                }
+                var bd = _phcMainRepository.GetBaseDados(nomeBd) ?? throw new Exception($"Base de Dados {nomeBd} não encontrada.");
 
                 Debug.Print($"BDs    {bd.Nomebd}");
 
@@ -213,7 +208,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 //este case é para sincronizar consumos de ClientesOBA
                 case "Consumo":
-                    //SincronizarFt(formulario.Formid);
+                    SincronizarFtOBA(formulario.Formid);
 
                     break;
 
@@ -265,13 +260,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             try
             {
-                var dados = koboAPI.GetFormNaoAdicionadosPHC(formID);
-
-
-                if (dados == null)
-                {
-                    throw new Exception($"Null em {formID}");
-                }
+                var dados = koboAPI.GetFormNaoAdicionadosPHC(formID) ?? throw new Exception($"Null em {formID}");
 
                 if (dados.results.Count == 0)
                 {
@@ -543,6 +532,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
                 var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
                 */
+
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
 
                 cliente.UKoboSync = true;
@@ -591,31 +581,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
             return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
         }
 
-
-        /*
-        public ResponseDTO RegistarCliente(int id, string DB)
-        {
-
-            var cliente = Sw_GetCl2IdKobo(id, DB);
-
-            var responseID = logHelper.generateResponseID();
-
-            var formID = Sw_GetUFormId("Levantamento de", DB);
-            var response = koboAPI.UpdIsClientePHC(id, formID.Formid);
-
-            //try
-
-            if (response.failures == 0)
-            {
-                cliente.UKoboSync = true;
-                cliente.UOrigem = "KoboToolbox";
-                Sw_SaveChanges(DB);
-            }
-
-
-            return new ResponseDTO(new ResponseCodesDTO("0000", "Success", responseID), response, null);
-        }
-        */
 
 
 
