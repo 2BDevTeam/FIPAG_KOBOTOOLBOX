@@ -77,7 +77,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     if (cl == null)
                     {
                         Debug.Print($"Cliente com PhcId {oBA.PhcId} não encontrado.");
-                         
+
                         oBA.Error = "Não encontrado no PHC";
                         continue;
                     }
@@ -108,7 +108,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public async Task SincronizarFt()
+        public void SincronizarFt(string formId)
         {
 
             var consumos = _phcMainRepository.GetConsumos();
@@ -117,13 +117,13 @@ namespace FIPAG_KOBOTOOLBOX.Services
             foreach (var consumo in consumos)
             {
                 Debug.Print("fttttttttt " + consumo.Ftstamp);
-                BackgroundJob.Enqueue(() => SyncFactura(consumo));
+                BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
 
             }
 
         }
 
-        public void SyncFactura(Consumos cons)
+        public void SyncFactura(Consumos cons, string formId)
         {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset localTime = now.ToOffset(TimeSpan.FromHours(2));
@@ -182,7 +182,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
 
-                var insertFt = koboAPI.AddDataToKobo(body, "Consumos");
+                var insertFt = koboAPI.AddDataToKobo(body, formId);
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
                 {
@@ -255,6 +255,14 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
             switch (formulario.SubNome)
             {
+
+                //este case é para sincronizar consumos de ClientesOBA
+                case "Consumo":
+                    SincronizarFt(formulario.Formid);
+
+                    break;
+
+                //case normal
                 /*
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
@@ -565,7 +573,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
                 }
-                
+
 
                 /**** REMOVIDO DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
                 //formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
