@@ -248,7 +248,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 case "Levantamento":
 
-                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+                    //AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
 
                     break;
 
@@ -286,7 +286,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
-                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
 
                     var em = new Em
                     {
@@ -318,6 +317,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     };
 
                     _phcDynamicRepository.Add(dynamicContext, em);
+                    
+                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
+
                     emNo++;
                 }
 
