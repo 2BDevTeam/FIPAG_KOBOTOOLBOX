@@ -232,15 +232,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         }
 
 
-        public List<Obaclientes> GetOBAClientes()
-        {
-            return _context.Set<Obaclientes>()
-                .Where(bd => bd.PhcId != 0 && bd.Sync == false)
-                //.Take(50)
-               .ToList();
-        }
-
-
         public Cl GetClByNo(int no)
         {
             return _context.Set<Cl>()

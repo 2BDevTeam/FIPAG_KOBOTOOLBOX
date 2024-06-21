@@ -62,51 +62,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public async Task SyncClientesOBA()
-        {
-            try
-            {
-                var clsOBA = _phcMainRepository.GetOBAClientes();
-                Debug.Print($"Clientes OBA  {clsOBA.Count}");
-
-                List<Cl2> lstcl2 = new List<Cl2>();
-                foreach (var oBA in clsOBA)
-                {
-                    var cl = _phcMainRepository.GetClByNo((int)oBA.PhcId);
-
-                    if (cl == null)
-                    {
-                        Debug.Print($"Cliente com PhcId {oBA.PhcId} não encontrado.");
-
-                        oBA.Error = "Não encontrado no PHC";
-                        continue;
-                    }
-
-                    var cl2 = _phcMainRepository.GetCl2ByStamp(cl.Clstamp);
-                    cl2.UKoboSync = true;
-                    cl2.UKoboOri = true;
-                    cl2.UKoboid = (decimal)oBA.KoboId;
-
-                    lstcl2.Add(cl2);
-
-                    oBA.Sync = true;
-                }
-
-
-                _genericRepositoryOnBD.BulkUpdate(lstcl2);
-                _genericRepositoryOnBD.BulkUpdate(clsOBA);
-                _genericRepositoryOnBD.SaveChanges();
-
-            }
-            catch (Exception ex)
-            {
-                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
-                Debug.Print($"ProcessarFormularios ERROR DTO {errorDTO}");
-                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
-                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "ProcessarFormularios", errorDTO?.ToString());
-            }
-        }
-
 
         public void SincronizarFt(string formId)
         {
@@ -258,7 +213,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 //este case é para sincronizar consumos de ClientesOBA
                 case "Consumo":
-                    SincronizarFt(formulario.Formid);
+                    //SincronizarFt(formulario.Formid);
 
                     break;
 
@@ -574,11 +529,20 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
                 }
 
+                formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
 
-                /**** REMOVIDO DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
-                //formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
-                //var updBeneficiario = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
+                var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
+                    .FirstOrDefault()._id;
+                throw new Exception($"IDD KoboToolbox {iddKobo}");
 
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo, formID.Formid);
+                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo, formID.Formid);
+
+                /*
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
+                */
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
 
                 cliente.UKoboSync = true;

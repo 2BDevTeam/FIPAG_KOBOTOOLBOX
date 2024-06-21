@@ -76,6 +76,60 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
+        public ResultsResponseDTO GetResultByIdd(int idd, string formID)
+        {
+
+            try
+            {
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(200, "assets", $"/{formID}/data/?format=json&query={{\"_idd\":\"{idd}\"}}");
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                //Debug.Print($"Test");
+
+                StreamReader streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream());
+
+                result = streamReader.ReadToEnd();
+
+                Debug.Print($"RESULT Results {result}");
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
+
+                return results;
+            }
+            catch (WebException ex)
+            {
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
+                String rawresp = reader.ReadToEnd();
+                Debug.WriteLine("GET GetResultByIdd WEB EXCEPTION  Response::::---::::: " + rawresp);
+
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " + rawresp };
+                //Debug.Print($"ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResultByIdd", rawresp);
+
+                return null;
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"GetResultByIdd ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResultByIdd", errorDTO?.ToString());
+                return null;
+
+            }
+        }
+
+
         public UpdateResponseDTO UpdNaoAdicionadosPHC(int id, string formID)
         {
             //string formID = "aj3EiDTv5DmsrxsPEGwi28";

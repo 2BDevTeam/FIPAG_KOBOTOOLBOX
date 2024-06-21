@@ -5,7 +5,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
 {
     public interface IPHCMainRepository <TContext> where TContext : DbContext
     {
-        public List<Obaclientes> GetOBAClientes();
 
         public Cl GetClByNo(int no);
         public List<Cl> GetClients();

@@ -8,6 +8,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         public string start { get; set; }
         public string end { get; set; }
         public int _id { get; set; }
+        public int _idd { get; set; }
         public string _uuid { get; set; }
 
         [JsonProperty(PropertyName = "grupo1/cidade")]

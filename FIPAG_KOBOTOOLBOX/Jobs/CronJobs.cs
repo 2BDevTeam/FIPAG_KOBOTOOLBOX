@@ -31,11 +31,6 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
 
 
-            RecurringJob.AddOrUpdate(
-               "SincronizarClientesOBA",
-               () => KOBOService.SyncClientesOBA(),
-              Cron.Yearly());
-            
             /*
             RecurringJob.AddOrUpdate(
                "SincronizarFt",
