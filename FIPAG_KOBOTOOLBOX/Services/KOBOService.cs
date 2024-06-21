@@ -333,7 +333,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         }
 
-
         public void ProcessCliente(USyncQueue usync, string stamp, string accao, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
         {
 
@@ -536,7 +535,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
                 var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
                     .FirstOrDefault()._id;
-                throw new Exception($"IDD KoboToolbox {iddKobo}");
 
                 var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo, formID.Formid);
                 var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo, formID.Formid);
