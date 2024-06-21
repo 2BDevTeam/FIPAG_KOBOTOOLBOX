@@ -231,9 +231,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-                var aux = _phcDynamicRepository.GetBoTeste(dynamicContext);
-
-
                 foreach (var formulario in formularios)
                 {
                     SincrinizarDadosUSyncQueue(formulario, dynamicContext);
