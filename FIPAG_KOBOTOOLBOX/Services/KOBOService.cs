@@ -208,6 +208,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 //este case é para sincronizar consumos de ClientesOBA
                 case "Consumo":
+                    Debug.Print($"consumo {formulario.Formid}");
+
                     SincronizarFtOBA(formulario.Formid);
 
                     break;
