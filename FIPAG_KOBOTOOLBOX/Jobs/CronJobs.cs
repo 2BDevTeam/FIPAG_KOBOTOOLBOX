@@ -26,7 +26,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
                "ProcessarFormularios_OnBD_FIPAG",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG"),
               Cron.Minutely());
-            */
+            */ 
 
 
 
