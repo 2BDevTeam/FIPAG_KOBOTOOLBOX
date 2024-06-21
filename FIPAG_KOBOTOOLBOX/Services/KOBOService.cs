@@ -207,15 +207,16 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
 
                 //este case é para sincronizar consumos de ClientesOBA
+                /*
                 case "Consumo":
                     Debug.Print($"consumo {formulario.Formid}");
 
                     SincronizarFtOBA(formulario.Formid);
 
                     break;
+                    */
 
                 //case normal
-                /*
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
                     Debug.Print($"TOTAL DE Consumos DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueFt.Count()}");
@@ -228,7 +229,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     break;
 
-                    */
                 case "Ligação":
 
                     var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
