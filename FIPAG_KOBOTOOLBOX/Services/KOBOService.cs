@@ -72,7 +72,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             foreach (var consumo in consumos)
             {
                 Debug.Print("fttttttttt " + consumo.Ftstamp);
-                //BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
+                BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
 
             }
 
