@@ -433,6 +433,11 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
         }
 
 
+
+        /*
+         https://kf.kobotoolbox.org/api/v2/assets/aRvGf6VwkPF9878G3KTenn/data/?format=json&query={"$and":[{"_validation_status.uid":"validation_status_approved"},{"_id":"252735225"}]}
+         */
+
         public ResultsResponseDTO GetFormNaoAdicionadosPHC(string formID)
         {
 
@@ -446,7 +451,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                 HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
                     200,
                     "assets",
-                    $"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
+                    //$"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
+                    $"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
                 );
 
                 var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();

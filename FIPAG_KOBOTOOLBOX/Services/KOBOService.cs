@@ -223,7 +223,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        //ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -236,7 +236,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueCl)
                     {
-                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+                        //ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
 
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
@@ -245,7 +245,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 case "Levantamento":
 
-                    //AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
 
                     break;
 
@@ -277,6 +277,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
+                    var localiz= dado.localizacao.Split(' ');
 
                     var em = new Em
                     {
@@ -301,6 +302,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UEndereco = dado.endereco,
                         UKoboid = dado._id,
                         UKoboori = true,
+                        Latitude=  Decimal.Parse(localiz[0]),
+                        Longitude = Decimal.Parse(localiz[1]),
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
                         Ousrhora = DateTime.Now.ToString("HH:mm"),

@@ -20,7 +20,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
              
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG",
-               () => KOBOService.ProcessarFormularios("OnTS_OBA_AdRC_TETE"),
+               () => KOBOService.ProcessarFormularios("OnBD_FIPAG"),
               Cron.Yearly());
             /*
             RecurringJob.AddOrUpdate(
