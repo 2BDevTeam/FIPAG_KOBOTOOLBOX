@@ -277,7 +277,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
-                    var localiz= dado.localizacao.Split(' ');
+                    var localiz = new string[4];
+
+                    if (dado.localizacao.Trim() != "")
+                    {
+                        localiz = dado.localizacao.Split(' ');
+                    }
 
                     var em = new Em
                     {
@@ -302,7 +307,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UEndereco = dado.endereco,
                         UKoboid = dado._id,
                         UKoboori = true,
-                        Latitude=  Decimal.Parse(localiz[0]),
+                        Latitude = Decimal.Parse(localiz[0]),
                         Longitude = Decimal.Parse(localiz[1]),
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
@@ -311,7 +316,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     };
 
                     _phcDynamicRepository.Add(dynamicContext, em);
-                    
+
                     var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
 
                     emNo++;
