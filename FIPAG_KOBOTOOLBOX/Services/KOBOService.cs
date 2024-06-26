@@ -223,7 +223,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        //ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -277,23 +277,25 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
-                    var localiz = new string[4];
+                    var localiz = new string[] { "0", "0", "0", "0" };
 
                     if (dado.localizacao != null)
                     {
                         localiz = dado.localizacao.Split(' ');
                     }
 
+                    var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));
                     var em = new Em
                     {
                         Emstamp = 25.UseThisSizeForStamp(),
                         No = emNo,
-                        Zona = dado.Bairro,
+                        Zona = lBairro,
                         Nome = dado.nome_chefe_af.Trim(),
                         Pais = dado.PaisOrigem,
                         UNascimen = dado.DataDeNascimento,
                         Local = dado.cidade,
-                        Morada = $"{dado.endereco}, {dado.Quarteirao}, {dado.ncasa}",
+                        //Morada = $"{dado.endereco}, {dado.Quarteirao}, {dado.ncasa}",
+                        Morada = $"{lBairro}, {dado.Quarteirao}, {dado.ncasa}",
                         UBidata = dado.DataEmissaoBI,
                         UBino = dado.NrBi,
                         UBilocal = dado.LocalEmissaoBI,
@@ -307,28 +309,35 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UEndereco = dado.endereco,
                         UKoboid = dado._id,
                         UKoboori = true,
-                        Latitude = Decimal.Parse(localiz[0]),
-                        Longitude = Decimal.Parse(localiz[1]),
+                        //Latitude = Decimal.Parse(localiz[0]),
+                        //Longitude = Decimal.Parse(localiz[1]),
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
                         Ousrhora = DateTime.Now.ToString("HH:mm"),
                         Usrhora = DateTime.Now.ToString("HH:mm")
                     };
+                    Debug.Print($"dado.id {em.UEndereco}");
 
                     _phcDynamicRepository.Add(dynamicContext, em);
+                    _phcDynamicRepository.SaveChanges(dynamicContext);
 
                     var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
 
                     emNo++;
                 }
 
-                _phcDynamicRepository.SaveChanges(dynamicContext);
-
+            }
+            catch (DbUpdateException ex)
+            {
+                Debug.Print("An error occurred while updating the database.");
+                Debug.Print($"Error: {ex.InnerException?.Message ?? ex.Message}");
+                throw; // Rethrow the exception to preserve stack trace if needed
             }
             catch (Exception ex)
             {
                 Debug.Print($"ERRO AO AdicionarLevantamentoBeneficiarios {ex.Message}");
             }
+
 
         }
 
