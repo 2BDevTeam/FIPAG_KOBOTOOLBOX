@@ -281,7 +281,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     if (dado.localizacao.Trim() != "")
                     {
-                        localiz = dado.localizacao.Split(' ');
+                        localiz = dado.localizacao.Split(' '); 
                     }
 
                     var em = new Em
