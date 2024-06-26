@@ -285,6 +285,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     }
 
                     var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));
+                    //Nome
                     var em = new Em
                     {
                         Emstamp = 25.UseThisSizeForStamp(),
@@ -294,7 +295,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Pais = dado.PaisOrigem,
                         UNascimen = dado.DataDeNascimento,
                         Local = dado.cidade,
-                        //Morada = $"{dado.endereco}, {dado.Quarteirao}, {dado.ncasa}",
                         Morada = $"{lBairro}, {dado.Quarteirao}, {dado.ncasa}",
                         UBidata = dado.DataEmissaoBI,
                         UBino = dado.NrBi,
@@ -309,8 +309,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UEndereco = dado.endereco,
                         UKoboid = dado._id,
                         UKoboori = true,
-                        //Latitude = Decimal.Parse(localiz[0]),
-                        //Longitude = Decimal.Parse(localiz[1]),
+                        Latitude = Decimal.Parse(localiz[0]),
+                        Longitude = Decimal.Parse(localiz[1]),
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
                         Ousrhora = DateTime.Now.ToString("HH:mm"),
