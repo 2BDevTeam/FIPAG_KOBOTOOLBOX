@@ -223,7 +223,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 case "Levantamento":
 
-                    //AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
 
                     break;
 
@@ -590,7 +590,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var currentDate = DateTime.Now;
                 var liftUntil = currentDate.AddDays(3650);
 
-                Debug.Print($"Erro SYNC AUTOMATICO PARA O CL {no}");
+                Debug.Print($"Erro Add Ligações PARA O CL {no}");
 
                 var syncReport = new USyncreport
                 {
