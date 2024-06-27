@@ -206,6 +206,28 @@ namespace FIPAG_KOBOTOOLBOX.Services
             switch (formulario.SubNome)
             {
 
+
+                case "Ligação":
+
+                    var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
+                    Debug.Print($"TOTAL DE Ligações DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueCl.Count()}");
+
+                    foreach (var sq in syncQueueCl)
+                    {
+                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+
+                    }
+                    _phcDynamicRepository.SaveChanges(dynamicContext);
+
+                    break;
+
+                case "Levantamento":
+
+                    //AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+
+                    break;
+
+
                 //este case é para sincronizar consumos de ClientesOBA
                 /*
                 case "Consumo":
@@ -217,6 +239,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     */
 
                 //case normal
+
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
                     Debug.Print($"TOTAL DE Consumos DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueFt.Count()}");
@@ -226,26 +249,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
-
-                    break;
-
-                case "Ligação":
-
-                    var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
-                    Debug.Print($"TOTAL DE Ligações DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueCl.Count()}");
-
-                    foreach (var sq in syncQueueCl)
-                    {
-                        //ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
-
-                    }
-                    _phcDynamicRepository.SaveChanges(dynamicContext);
-
-                    break;
-
-                case "Levantamento":
-
-                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
 
                     break;
 
@@ -281,7 +284,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     if (dado.localizacao != null)
                     {
-                        localiz = dado.localizacao.Split(' '); 
+                        localiz = dado.localizacao.Split(' ');
                     }
 
                     var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));

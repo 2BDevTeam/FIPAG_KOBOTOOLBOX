@@ -50,10 +50,14 @@ namespace FIPAG_KOBOTOOLBOX.Helper
             //httpWebRequest.Host = Host;
             // httpWebRequest.UseDefaultCredentials = UseDefaultCredentials;
             //httpWebRequest.Headers.Add("Authorization","Bearer "+ Authorization);
-            httpWebRequest.Headers.Add("Authorization", "Token " + "9ce660df65c753deea9462726647d5c0f586a5fe");
 
-            // httpWebRequest.Headers.Add("Origin", Origin);
-            // httpWebRequest.Headers.Add("User-Agent", userAgent);
+
+            /*  CONTA OBA  */
+            //httpWebRequest.Headers.Add("Authorization", "Token " + "9ce660df65c753deea9462726647d5c0f586a5fe");
+            
+            /*  MINHA CONTA  */
+            httpWebRequest.Headers.Add("Authorization", "Token " + "7f74c66bd3c76132c8a4388a9f6d2e9aad876971");
+
 
             // Imprimir o conteúdo completo do cabeçalho
             Debug.Print("Saindo do helper: " + httpWebRequest.ToString());
