@@ -23,6 +23,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         public virtual DbSet<ApiLogs> ApiLogs { get; set; } = null!;
         public virtual DbSet<UProvider> UProvider { get; set; } = null!;
         public virtual DbSet<UFormid> UFormid { get; set; } = null!;
+        public virtual DbSet<USyncreport> USyncreport { get; set; } = null!;
 
         public virtual DbSet<Cl> Cl { get; set; } = null!;
         public virtual DbSet<Cl2> Cl2 { get; set; } = null!;
@@ -222,6 +223,82 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasDefaultValueSql("('')");
             });
 
+            modelBuilder.Entity<USyncreport>(entity =>
+            {
+                entity.HasKey(e => e.USyncreportstamp)
+                    .HasName("pk_u_syncreport")
+                    .IsClustered(false);
+
+                entity.ToTable("u_syncreport");
+
+                entity.Property(e => e.USyncreportstamp)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("u_syncreportstamp")
+                    .HasDefaultValueSql("('')")
+                    .IsFixedLength();
+
+                entity.Property(e => e.Koboid)
+                    .HasColumnType("numeric(12, 0)")
+                    .HasColumnName("koboid");
+
+                entity.Property(e => e.Marcada).HasColumnName("marcada");
+
+                entity.Property(e => e.Obs)
+                    .HasColumnType("text")
+                    .HasColumnName("obs")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Ousrdata)
+                    .HasColumnType("datetime")
+                    .HasColumnName("ousrdata")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Ousrhora)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .HasColumnName("ousrhora")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Ousrinis)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("ousrinis")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Tabno)
+                    .HasColumnType("numeric(12, 0)")
+                    .HasColumnName("tabno");
+
+                entity.Property(e => e.Tabstamp)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("tabstamp")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Usrdata)
+                    .HasColumnType("datetime")
+                    .HasColumnName("usrdata")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Usrhora)
+                    .HasMaxLength(8)
+                    .IsUnicode(false)
+                    .HasColumnName("usrhora")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Usrinis)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("usrinis")
+                    .HasDefaultValueSql("('')");
+            });
 
 
             modelBuilder.Entity<UFormid>(entity =>

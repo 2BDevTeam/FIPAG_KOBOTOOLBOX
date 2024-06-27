@@ -531,39 +531,46 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
 
-                var formID = _phcMainRepository.GetFormID("Ligação", stampBD);
-                Debug.Print($"stampBD {stampBD}");
 
+
+                var formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
+
+                /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
+                var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
+                    .FirstOrDefault();
+
+                if (iddKobo == null)
+                {
+                    AddChangesSyncReport(lig.IDBenefKobo, lig.No, "Cliente não encontrado na lista de beneficiários do Kobotoolbox.", dynamicContext, usync);
+                    throw new Exception("Cliente não encontrado na lista de beneficiários do Kobotoolbox.");
+                }
+
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo._id, formID.Formid);
+                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo._id, formID.Formid);
+
+                /*
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
+                */
 
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
+
                 cliente.UKoboSync = true;
 
                 _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
-
                 _phcDynamicRepository.SaveChanges(dynamicContext);
 
 
+                formID = _phcMainRepository.GetFormID("Ligação", stampBD);
+                Debug.Print($"stampBD {stampBD}");
 
                 var insertFt = koboAPI.AddDataToKobo(body, formID.Formid);
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
                 {
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
+
                 }
-
-                formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
-
-                /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
-                var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
-                    .FirstOrDefault()._id; 
-
-                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo, formID.Formid);
-                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo, formID.Formid);
-
-                /*
-                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
-                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
-                */
 
             }
             catch (Exception ex)
@@ -574,6 +581,42 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncFactura", errorDTO?.ToString());
             }
         }
+
+
+        public void AddChangesSyncReport(int koboId, int no, string motivo, DynamicContext dynamicContext, USyncQueue usync)
+        {
+            try
+            {
+                var currentDate = DateTime.Now;
+                var liftUntil = currentDate.AddDays(3650);
+
+                Debug.Print($"Erro SYNC AUTOMATICO PARA A FATURA {ft.Ftstamp}");
+
+                var syncReport = new USyncreport
+                {
+                    USyncreportstamp = 25.UseThisSizeForStamp(),
+                    Status = "Erro",
+                    Obs = motivo,
+                    Tabno = no,
+                    Koboid = koboId,
+                    Ousrdata = DateTime.Now.Date,
+                    Usrdata = DateTime.Now.Date,
+                    Ousrhora = DateTime.Now.ToString("HH:mm"),
+                    Usrhora = DateTime.Now.ToString("HH:mm"),
+                };
+
+                _phcDynamicRepository.Add(dynamicContext, syncReport);
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+                _phcDynamicRepository.SaveChanges(dynamicContext);
+
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"ERRO AO PROCESSAR O LIFT {ex.Message}");
+            }
+
+        }
+
 
         public void SyncLigacaoUpdate(Ligacoes lig)
         {
