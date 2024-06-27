@@ -545,7 +545,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
                 var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
-                    .FirstOrDefault()._id;
+                    .FirstOrDefault()._id; 
 
                 var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo, formID.Formid);
                 var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo, formID.Formid);
