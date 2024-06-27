@@ -534,6 +534,16 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var formID = _phcMainRepository.GetFormID("Ligação", stampBD);
                 Debug.Print($"stampBD {stampBD}");
 
+
+                var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
+                cliente.UKoboSync = true;
+
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+
+                _phcDynamicRepository.SaveChanges(dynamicContext);
+
+
+
                 var insertFt = koboAPI.AddDataToKobo(body, formID.Formid);
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
@@ -555,13 +565,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
                 */
 
-                var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
-
-                cliente.UKoboSync = true;
-
-                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
-
-                _phcDynamicRepository.SaveChanges(dynamicContext);
             }
             catch (Exception ex)
             {
