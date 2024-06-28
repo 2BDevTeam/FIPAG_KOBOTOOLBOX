@@ -452,8 +452,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                     200,
                     "assets",
                     //$"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
-                    //$"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
-                    $"/{formID}/data/?format=json&query={{\"_validation_status.uid\":\"validation_status_approved\"}}&start={start}&limit={limit}"
+                    $"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
+                //$"/{formID}/data/?format=json&query={{\"_validation_status.uid\":\"validation_status_approved\"}}&start={start}&limit={limit}"
                 );
 
                 var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();

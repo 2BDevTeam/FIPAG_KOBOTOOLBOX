@@ -62,22 +62,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-
-        public void SincronizarFtOBA(string formId)
-        {
-
-            var consumos = _phcMainRepository.GetConsumos();
-            Debug.Print($"TOTAL DE FATURAS POR SINCRONIZAR {consumos.Count()}");
-
-            foreach (var consumo in consumos)
-            {
-                Debug.Print("fttttttttt " + consumo.Ftstamp);
-                BackgroundJob.Enqueue(() => SyncFactura(consumo, formId));
-
-            }
-
-        }
-
         public void SyncFactura(Consumos cons, string formId)
         {
             DateTimeOffset now = DateTimeOffset.Now;
@@ -226,19 +210,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
 
                     break;
-
-
-                //este case é para sincronizar consumos de ClientesOBA
-                /*
-                case "Consumo":
-                    Debug.Print($"consumo {formulario.Formid}");
-
-                    SincronizarFtOBA(formulario.Formid);
-
-                    break;
-                    */
-
-                //case normal
 
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
