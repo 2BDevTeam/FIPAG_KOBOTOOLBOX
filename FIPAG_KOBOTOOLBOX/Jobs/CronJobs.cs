@@ -20,7 +20,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
              
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG",
-               () => KOBOService.ProcessarFormularios("OnTS_OBA_AdRC_MOATIZE"),
+               () => KOBOService.ProcessarFormularios("OnTS_OBA_AdRC_MOATIZE", "Moatize"),
               Cron.Yearly());
             /*
             RecurringJob.AddOrUpdate(

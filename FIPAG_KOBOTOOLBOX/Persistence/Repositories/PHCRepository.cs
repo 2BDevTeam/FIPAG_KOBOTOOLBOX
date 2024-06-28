@@ -226,7 +226,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         public ULibasedado GetFormID(string nome, string bdstamp)
         {
             return _context.Set<ULibasedado>()
-            .Where(f => f.SubNome == nome
+            .Where(f => f.Subnome == nome
                     && f.Basedadosstamp == bdstamp)
             .ToList().FirstOrDefault();
         }

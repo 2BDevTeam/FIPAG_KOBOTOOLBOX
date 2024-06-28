@@ -146,7 +146,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-        public async Task ProcessarFormularios(string nomeBd)
+        public async Task ProcessarFormularios(string nomeBd, string cidade)
         {
 
             try
@@ -167,7 +167,10 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 foreach (var formulario in formularios)
                 {
-                    SincrinizarDadosUSyncQueue(formulario, dynamicContext);
+
+
+
+                    SincrinizarDadosUSyncQueue(formulario, cidade, dynamicContext);
 
                 }
 
@@ -183,14 +186,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public async Task SincrinizarDadosUSyncQueue(ULibasedado formulario, DynamicContext dynamicContext)
+        public async Task SincrinizarDadosUSyncQueue(ULibasedado formulario, string cidade, DynamicContext dynamicContext)
         {
-            Debug.Print($"SincrinizarDadosUSyncQueue    {formulario.SubNome}");
+            Debug.Print($"SincrinizarDadosUSyncQueue    {formulario.Subnome} - {formulario.FormCidade}");
 
-            switch (formulario.SubNome)
+            switch (formulario.Subnome)
             {
-
-
                 case "Ligação":
 
                     var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
@@ -199,7 +200,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     foreach (var sq in syncQueueCl)
                     {
                         ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
-
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -207,7 +207,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 case "Levantamento":
 
-                    AdicionarLevantamentoBeneficiarios(formulario.Formid, dynamicContext);
+                    if (formulario.FormCidade == cidade)
+                        AdicionarLevantamentoBeneficiarios(formulario.Formid, cidade, dynamicContext);
 
                     break;
 
@@ -231,17 +232,19 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-        public void AdicionarLevantamentoBeneficiarios(string formID, DynamicContext dynamicContext)
+        public void AdicionarLevantamentoBeneficiarios(string formID, string cidade, DynamicContext dynamicContext)
         {
 
             try
             {
-                var dados = koboAPI.GetFormNaoAdicionadosPHC(formID) ?? throw new Exception($"Null em {formID}");
+                var dados = koboAPI.GetFormNaoAdicionadosPHC(formID, cidade) ?? throw new Exception($"Null em {formID}");
 
                 if (dados.results.Count == 0)
                 {
                     throw new Exception($"Sem dados em {formID}");
                 }
+                
+                throw new Exception($"Sem dados em {formID}");
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 

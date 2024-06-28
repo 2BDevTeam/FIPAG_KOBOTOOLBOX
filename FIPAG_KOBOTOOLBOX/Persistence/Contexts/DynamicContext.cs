@@ -85,6 +85,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasDefaultValueSql("('')")
                     .IsFixedLength();
 
+                entity.Property(e => e.FormCidade)
+                    .HasMaxLength(80)
+                    .IsUnicode(false)
+                    .HasColumnName("formCidade")
+                    .HasDefaultValueSql("('')");
+
                 entity.Property(e => e.Formid)
                     .HasMaxLength(100)
                     .IsUnicode(false)
@@ -97,12 +103,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasMaxLength(100)
                     .IsUnicode(false)
                     .HasColumnName("nome")
-                    .HasDefaultValueSql("('')");
-
-                entity.Property(e => e.SubNome)
-                    .HasMaxLength(100)
-                    .IsUnicode(false)
-                    .HasColumnName("SUBNOME")
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Ousrdata)
@@ -120,6 +120,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasMaxLength(30)
                     .IsUnicode(false)
                     .HasColumnName("ousrinis")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Subnome)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("subnome")
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Usrdata)

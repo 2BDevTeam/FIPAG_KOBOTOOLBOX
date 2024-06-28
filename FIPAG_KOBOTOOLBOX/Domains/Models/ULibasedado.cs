@@ -7,9 +7,10 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
     {
         public string ULibasedadostamp { get; set; } = null!;
         public string Nome { get; set; } = null!;
-        public string SubNome { get; set; } = null!;
         public string Formid { get; set; } = null!;
         public string Basedadosstamp { get; set; } = null!;
+        public string Subnome { get; set; } = null!;
+        public string FormCidade { get; set; } = null!;
         public string Ousrinis { get; set; } = null!;
         public DateTime Ousrdata { get; set; }
         public string Ousrhora { get; set; } = null!;

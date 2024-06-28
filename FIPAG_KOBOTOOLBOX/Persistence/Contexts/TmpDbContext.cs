@@ -17,7 +17,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         {
         }
 
-        public virtual DbSet<USyncreport> USyncreport { get; set; } = null!;
+        public virtual DbSet<ULibasedado> ULibasedado { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,30 +32,46 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         {
             modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<USyncreport>(entity =>
+            modelBuilder.Entity<ULibasedado>(entity =>
             {
-                entity.HasKey(e => e.USyncreportstamp)
-                    .HasName("pk_u_syncreport")
+                entity.HasKey(e => e.ULibasedadostamp)
+                    .HasName("pk_u_libasedado")
                     .IsClustered(false);
 
-                entity.ToTable("u_syncreport");
+                entity.ToTable("u_libasedado");
 
-                entity.Property(e => e.USyncreportstamp)
+                entity.Property(e => e.ULibasedadostamp)
                     .HasMaxLength(25)
                     .IsUnicode(false)
-                    .HasColumnName("u_syncreportstamp")
+                    .HasColumnName("u_libasedadostamp")
                     .HasDefaultValueSql("('')")
                     .IsFixedLength();
 
-                entity.Property(e => e.Koboid)
-                    .HasColumnType("numeric(12, 0)")
-                    .HasColumnName("koboid");
+                entity.Property(e => e.Basedadosstamp)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("basedadosstamp")
+                    .HasDefaultValueSql("('')")
+                    .IsFixedLength();
+
+                entity.Property(e => e.FormCidade)
+                    .HasMaxLength(80)
+                    .IsUnicode(false)
+                    .HasColumnName("formCidade")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Formid)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("formid")
+                    .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Marcada).HasColumnName("marcada");
 
-                entity.Property(e => e.Obs)
-                    .HasColumnType("text")
-                    .HasColumnName("obs")
+                entity.Property(e => e.Nome)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("nome")
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Ousrdata)
@@ -75,20 +91,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("ousrinis")
                     .HasDefaultValueSql("('')");
 
-                entity.Property(e => e.Status)
-                    .HasMaxLength(100)
+                entity.Property(e => e.Subnome)
+                    .HasMaxLength(50)
                     .IsUnicode(false)
-                    .HasColumnName("status")
-                    .HasDefaultValueSql("('')");
-
-                entity.Property(e => e.Tabno)
-                    .HasColumnType("numeric(12, 0)")
-                    .HasColumnName("tabno");
-
-                entity.Property(e => e.Tabstamp)
-                    .HasMaxLength(25)
-                    .IsUnicode(false)
-                    .HasColumnName("tabstamp")
+                    .HasColumnName("subnome")
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Usrdata)

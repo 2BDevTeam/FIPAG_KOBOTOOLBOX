@@ -438,11 +438,11 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
          https://kf.kobotoolbox.org/api/v2/assets/aRvGf6VwkPF9878G3KTenn/data/?format=json&query={"$and":[{"_validation_status.uid":"validation_status_approved"},{"_id":"252735225"}]}
          */
 
-        public ResultsResponseDTO GetFormNaoAdicionadosPHC(string formID)
+        public ResultsResponseDTO GetFormNaoAdicionadosPHC(string formID, string cidade)
         {
 
-            int limit = 300;
             int start = 0;
+            int limit = 300;
 
             try
             {
@@ -452,8 +452,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                     200,
                     "assets",
                     //$"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
-                    $"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
-                //$"/{formID}/data/?format=json&query={{\"_validation_status.uid\":\"validation_status_approved\"}}&start={start}&limit={limit}"
+                    //$"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
+                    //$"/{formID}/data/?format=json&query={{\"_validation_status.uid\":\"validation_status_approved\"}}&start={start}&limit={limit}"
+
+                    $"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}},{{\"grupo1/cidade\":\"{cidade}\"}}]}}&start={start}&limit={limit}\r\n"
                 );
 
                 var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
