@@ -244,7 +244,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     throw new Exception($"Sem dados em {formID}");
                 }
                 
-                throw new Exception($"Sem dados em {formID}");
+                throw new Exception($"Contagem de dados {dados.results.Count}");
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
