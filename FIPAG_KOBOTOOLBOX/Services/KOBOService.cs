@@ -506,6 +506,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
 
                 /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
+                /*
                 var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
                     .FirstOrDefault();
 
@@ -517,11 +518,11 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo._id, formID.Formid);
                 var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo._id, formID.Formid);
-
-                /*
-                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
-                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
                 */
+
+
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                //var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
 
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
 
