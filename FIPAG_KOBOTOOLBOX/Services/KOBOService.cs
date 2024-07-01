@@ -168,8 +168,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 foreach (var formulario in formularios)
                 {
 
-
-
                     SincrinizarDadosUSyncQueue(formulario, cidade, dynamicContext);
 
                 }
@@ -199,7 +197,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueCl)
                     {
-                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+                        //ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -218,7 +216,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        //ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -243,8 +241,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     throw new Exception($"Sem dados em {formID}");
                 }
-                
-                throw new Exception($"Contagem de dados {dados.results.Count}");
+                    throw new Exception($"Nr dados em {dados.results.Count}");
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
