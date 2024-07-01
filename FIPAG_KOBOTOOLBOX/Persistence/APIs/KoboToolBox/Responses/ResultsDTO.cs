@@ -83,7 +83,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         [JsonProperty(PropertyName = "group4/adicionado_PHC")]
         public string adicionadoPHC { get; set; }
 
-        [JsonProperty(PropertyName = "group4/localizacao")]
+        //[JsonProperty(PropertyName = "group4/localizacao")]
+        [JsonProperty(PropertyName = "group_od5ty14/localizacao")]
         public string localizacao { get; set; }
 
         [JsonProperty(PropertyName = "group4/Nome_do_inquiridor")]
