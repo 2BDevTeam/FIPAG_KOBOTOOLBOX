@@ -280,7 +280,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         //UNquart =dado.Quarteirao,
                         UNcasa = dado.ncasa,
                         UEndereco = dado.endereco,
-                        UKoboid = dado._idd,
+                        UKoboid = dado._id,
                         UKoboori = true,
                         Latitude = Decimal.Parse(localiz[0]),
                         Longitude = Decimal.Parse(localiz[1]),
