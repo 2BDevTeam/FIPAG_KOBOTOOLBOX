@@ -16,19 +16,21 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
         public void JobHandler()
         {
-            
-             
-            RecurringJob.AddOrUpdate(
-               "ProcessarFormularios_OnBD_FIPAG",
-               () => KOBOService.ProcessarFormularios("OnBD_AdRC_MOATIZE", "Moatize"),
-              Cron.Yearly());
+
+
             /*
             RecurringJob.AddOrUpdate(
-               "ProcessarFormularios_OnBD_FIPAG",
-               () => KOBOService.ProcessarFormularios("OnTS_OBA_AdRC_TETE"),
+               "ProcessarFormularios_AdRC_MOATIZE",
+               () => KOBOService.ProcessarFormularios("OnBD_AdRC_MOATIZE", "Moatize"),
+              Cron.Yearly());
+            */
+
+
+            RecurringJob.AddOrUpdate(
+               "ProcessarFormularios_OnBD_FIPAG_TETE",
+               () => KOBOService.ProcessarFormularios("OnBD_FIPAG_TETE", "Cidade_de_Tete"),
               Cron.Minutely());
 
-            */ 
 
 
 
