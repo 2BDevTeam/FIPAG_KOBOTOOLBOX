@@ -33,6 +33,7 @@ using FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs;
 using AutoMapper.Features;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace FIPAG_KOBOTOOLBOX.Services
 {
@@ -258,7 +259,15 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     }
 
                     var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));
-                    //Nome
+
+                    var quarteirao = dado.Quarteirao;
+                    var ncasa = dado.ncasa;
+
+                    string morada = $"{(string.IsNullOrEmpty(lBairro) ? "" : lBairro)}" +
+                        $"{(quarteirao != "" ? (string.IsNullOrEmpty(lBairro) ? "" : ", ") + quarteirao : "")}" +
+                        $"{(ncasa != 0 ? ((quarteirao != "" || !string.IsNullOrEmpty(lBairro)) ? ", " : "") + ncasa : "")}";
+
+
                     var em = new Em
                     {
                         Emstamp = 25.UseThisSizeForStamp(),
@@ -268,14 +277,14 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Pais = dado.PaisOrigem,
                         UNascimen = dado.DataDeNascimento,
                         Local = dado.cidade,
-                        Morada = $"{lBairro}, {dado.Quarteirao}, {dado.ncasa}",
+                        Morada = morada,
                         UBidata = dado.DataEmissaoBI,
                         UBino = dado.NrBi,
                         UBilocal = dado.LocalEmissaoBI,
                         Telefone = dado.telefone,
                         Ncont = dado.nuit,
                         Pncont = "MZ",
-                        Ousrinis = dado.nuit,
+                        Ousrinis = "FIKOBOWS",
                         UOrigem = "KoboToolbox",
                         //UNquart =dado.Quarteirao,
                         UNcasa = dado.ncasa,
