@@ -29,7 +29,7 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG_TETE",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG_TETE", "Cidade_de_Tete"),
-              Cron.Yearly());
+              Cron.Hourly());
 
 
 
