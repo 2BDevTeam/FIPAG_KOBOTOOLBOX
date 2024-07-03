@@ -318,10 +318,18 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     };
                     Debug.Print($"dado.id {em.UEndereco}");
 
+                    //var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
+                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID);
+
+                    if (upd == null)
+                        throw new Exception("Erro ao actualizar dados");
+
+                    if (upd.successes != 1)
+                        throw new Exception("Erro ao actualizar dados");
+
                     _phcDynamicRepository.Add(dynamicContext, em);
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
-                    var upd = koboAPI.UpdNaoAdicionadosPHC(dado._id, formID).results;
 
                     emNo++;
                 }
@@ -569,7 +577,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 cliente.UKoboSync = true;
 
-                
+
 
 
                 formID = _phcMainRepository.GetFormID("Ligação", stampBD);
