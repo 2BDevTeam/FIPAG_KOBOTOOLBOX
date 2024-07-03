@@ -251,6 +251,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
+                    Debug.Print($"Benefeeeeeee {dado.localizacao}");
+                    
                     var localiz = new string[] { "0", "0", "0", "0" };
 
                     if (dado.localizacao != null)
@@ -263,10 +265,25 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     var quarteirao = dado.Quarteirao;
                     var ncasa = dado.ncasa;
 
-                    string morada = $"{(string.IsNullOrEmpty(lBairro) ? "" : lBairro)}" +
-                        $"{(quarteirao != "" ? (string.IsNullOrEmpty(lBairro) ? "" : ", ") + quarteirao : "")}" +
-                        $"{(ncasa != 0 ? ((quarteirao != "" || !string.IsNullOrEmpty(lBairro)) ? ", " : "") + ncasa : "")}";
 
+                    List<string> partesMorada = new List<string>();
+
+                    if (!string.IsNullOrWhiteSpace(lBairro))
+                    {
+                        partesMorada.Add(lBairro);
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(quarteirao) && quarteirao != "0")
+                    {
+                        partesMorada.Add(quarteirao);
+                    }
+
+                    if (ncasa != 0)
+                    {
+                        partesMorada.Add(ncasa.ToString());
+                    }
+
+                    string morada = string.Join(", ", partesMorada);
 
                     var em = new Em
                     {
