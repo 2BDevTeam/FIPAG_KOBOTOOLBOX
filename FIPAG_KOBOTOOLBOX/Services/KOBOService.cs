@@ -569,8 +569,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 cliente.UKoboSync = true;
 
-                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
-                _phcDynamicRepository.SaveChanges(dynamicContext);
+                
 
 
                 formID = _phcMainRepository.GetFormID("Ligação", stampBD);
@@ -580,9 +579,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 if (insertFt == null || insertFt.message != "Successful submission.")
                 {
+                    AddChangesSyncReport(lig.IDBenefKobo, lig.No, "Erro a introduzir a Ligação no KoboToolbox.", dynamicContext, usync);
                     throw new Exception("Erro a introduzir a Ligação no KoboToolbox.");
-
                 }
+
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+                _phcDynamicRepository.SaveChanges(dynamicContext);
 
             }
             catch (Exception ex)
