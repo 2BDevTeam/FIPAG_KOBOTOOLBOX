@@ -251,9 +251,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
-                    var localiz = new string[] { "0", "0", "0", "0" };
-                    
                     Debug.Print($"Benefeeeeeee {dado.localizacao}");
+                    
+                    var localiz = new string[] { "0", "0", "0", "0" };
 
                     if (dado.localizacao != null)
                     {
