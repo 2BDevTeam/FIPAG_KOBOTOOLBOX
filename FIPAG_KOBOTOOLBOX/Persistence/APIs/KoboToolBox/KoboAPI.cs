@@ -442,7 +442,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
         {
 
             int start = 0;
-            int limit = 10;
+            int limit = 100;
 
             try
             {

@@ -218,7 +218,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        //ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
