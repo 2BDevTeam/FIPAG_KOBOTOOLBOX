@@ -34,6 +34,7 @@ using AutoMapper.Features;
 using System.Collections;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
+using System.Globalization;
 
 namespace FIPAG_KOBOTOOLBOX.Services
 {
@@ -251,8 +252,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     Debug.Print($"Benefeeeeeee {dado._id}");
 
-                    Debug.Print($"Benefeeeeeee {dado.localizacao}");
-                    
+
                     var localiz = new string[] { "0", "0", "0", "0" };
 
                     if (dado.localizacao != null)
@@ -285,6 +285,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     string morada = string.Join(", ", partesMorada);
 
+                    Debug.Print($"Benefeeeeeee {dado.localizacao}");
                     var em = new Em
                     {
                         Emstamp = 25.UseThisSizeForStamp(),
@@ -308,8 +309,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UEndereco = dado.endereco,
                         UKoboid = dado._id,
                         UKoboori = true,
-                        Latitude = Decimal.Parse(localiz[0]),
-                        Longitude = Decimal.Parse(localiz[1]),
+                        Latitude = ParseDecimal(localiz[0]),
+                        Longitude = ParseDecimal(localiz[1]),
                         Ousrdata = DateTime.Now.Date,
                         Usrdata = DateTime.Now.Date,
                         Ousrhora = DateTime.Now.ToString("HH:mm"),
@@ -338,6 +339,20 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
 
 
+        }
+
+
+        private decimal ParseDecimal(string value)
+        {
+            if (Decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
+            {
+                return result;
+            }
+            else
+            {
+                Debug.Print($"Unable to parse '{value}' as a decimal.");
+                throw new FormatException($"Unable to parse '{value}' as a decimal.");
+            }
         }
 
         public void ProcessCliente(USyncQueue usync, string stamp, string accao, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
