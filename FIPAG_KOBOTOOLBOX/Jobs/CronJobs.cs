@@ -27,11 +27,16 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
 
             RecurringJob.AddOrUpdate(
+               "ProcessarFormularios_OnBD_FIPAG_Beira",
+               () => KOBOService.ProcessarFormularios("OnBD_Fipag_Beira", "Beira"),
+              Cron.Hourly());
+
+            /*
+            RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG_TETE",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG_TETE", "Cidade_de_Tete"),
               Cron.Hourly());
-
-
+             */
 
 
             /*

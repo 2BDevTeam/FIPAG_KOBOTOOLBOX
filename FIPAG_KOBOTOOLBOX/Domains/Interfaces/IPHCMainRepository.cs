@@ -10,7 +10,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
         public List<Cl> GetClients();
         public List<Consumos> GetConsumos();
         public Consumos GetConsumo(string ftstamp);
-        public List<USyncQueue> GetUSyncQueue();
         public Cl2 GetCl2ByIdKobo(int idKobo);
         public Cl2 GetCl2ByStamp(string cl2stamp);
         public Ft GetFt(string ftstamp);

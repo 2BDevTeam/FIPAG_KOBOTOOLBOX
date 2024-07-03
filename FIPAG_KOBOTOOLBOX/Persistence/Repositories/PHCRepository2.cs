@@ -109,8 +109,11 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab)
         {
+
             return _context.Set<USyncQueue>()
-                .Where(sq=> sq.Nometabela == nomeTab)
+                .Where(sq=> sq.Nometabela == nomeTab
+                        && sq.Ousrdata.Date != DateTime.Now.Date
+                        )
                .ToList();
         }
 

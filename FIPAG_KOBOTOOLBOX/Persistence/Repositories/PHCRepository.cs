@@ -99,12 +99,6 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 .FirstOrDefault();
         }
 
-        public List<USyncQueue> GetUSyncQueue()
-        {
-            return _context.Set<USyncQueue>()
-               .ToList();
-        }
-
 
         public List<Consumos> GetConsumos()
         {
