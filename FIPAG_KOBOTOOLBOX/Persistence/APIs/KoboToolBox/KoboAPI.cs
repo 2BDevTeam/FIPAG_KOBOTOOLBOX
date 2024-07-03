@@ -76,9 +76,63 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdNaoAdicionadosPHC(int id)
+        public ResultsResponseDTO GetResultByIdd(int idd, string formID)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
+
+            try
+            {
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(200, "assets", $"/{formID}/data/?format=json&query={{\"_idd\":\"{idd}\"}}");
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                //Debug.Print($"Test");
+
+                StreamReader streamReader = new System.IO.StreamReader(httpResponse.GetResponseStream());
+
+                result = streamReader.ReadToEnd();
+
+                Debug.Print($"RESULT Results {result}");
+
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
+
+                return results;
+            }
+            catch (WebException ex)
+            {
+
+                System.IO.StreamReader reader = new System.IO.StreamReader(ex?.Response?.GetResponseStream());
+                String rawresp = reader.ReadToEnd();
+                Debug.WriteLine("GET GetResultByIdd WEB EXCEPTION  Response::::---::::: " + rawresp);
+
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " + rawresp };
+                //Debug.Print($"ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("EX-500", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResultByIdd", rawresp);
+
+                return null;
+
+            }
+            catch (Exception ex)
+            {
+                var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
+                Debug.Print($"GetResultByIdd ERROR DTO {errorDTO}");
+                var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
+                logHelper.GenerateApiLog(finalResponse, logHelper.generateResponseID().ToString(), "GetResultByIdd", errorDTO?.ToString());
+                return null;
+
+            }
+        }
+
+
+        public UpdateResponseDTO UpdNaoAdicionadosPHC(int id, string formID)
+        {
+            //string formID = "aj3EiDTv5DmsrxsPEGwi28";
             try
             {
                 string result = "";
@@ -156,9 +210,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdIsClientePHC(int id)
+        public UpdateResponseDTO UpdIsClientePHC(int id, string formID)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
             try
             {
                 string result = "";
@@ -236,9 +289,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdEstadoLigacao(int id, string estado)
+
+
+        public UpdateResponseDTO UpdEstadoLigacao(int id, string estado, string formID)
         {
-            string formID = "aRGAdMpcPyV8dgjnisTatW";
+
+
+            //string formID = "aRGAdMpcPyV8dgjnisTatW";
             try
             {
                 string result = "";
@@ -376,47 +433,45 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
         }
 
 
-        public ResultsResponseDTO GetFormNaoAdicionadosPHC()
+
+        /*
+         https://kf.kobotoolbox.org/api/v2/assets/aRvGf6VwkPF9878G3KTenn/data/?format=json&query={"$and":[{"_validation_status.uid":"validation_status_approved"},{"_id":"252735225"}]}
+         */
+
+        public ResultsResponseDTO GetFormNaoAdicionadosPHC(string formID, string cidade)
         {
-            string formID = "aj3EiDTv5DmsrxsPEGwi28";
-            int limit = 100;
+
             int start = 0;
-            List<ResultsDTO> allResults = new List<ResultsDTO>();
+            int limit = 10;
 
             try
             {
-                while (true)
+                string result = "";
+
+                HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
+                    200,
+                    "assets",
+                    //$"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
+                    //$"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}}]}}&start={start}&limit={limit}"
+                    //$"/{formID}/data/?format=json&query={{\"_validation_status.uid\":\"validation_status_approved\"}}&start={start}&limit={limit}"
+
+                    $"/{formID}/data/?format=json&query={{\"$and\":[{{\"_validation_status.uid\":\"validation_status_approved\"}},{{\"group4/adicionado_PHC\":\"false\"}},{{\"grupo1/cidade\":\"{cidade}\"}}]}}&start={start}&limit={limit}\r\n"
+                );
+
+                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+                using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
-                    string result = "";
-
-                    HttpWebRequest httpWebRequest = httpHelper.getHttpWebRequestByProviderApiKey(
-                        200,
-                        "assets",
-                        $"/{formID}/data/?format=json&query={{\"group4/adicionado_PHC\":\"false\"}}&start={start}&limit={limit}"
-                    );
-
-                    var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                    using (StreamReader streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                    {
-                        result = streamReader.ReadToEnd();
-                    }
-
-                    var settings = new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore,
-                    };
-
-                    ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
-                    if (results.results == null || results.results.Count == 0)
-                    {
-                        break;
-                    }
-
-                    allResults.AddRange(results.results);
-                    start += limit;
+                    result = streamReader.ReadToEnd();
                 }
 
-                return new ResultsResponseDTO { results = allResults };
+                var settings = new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                };
+
+                ResultsResponseDTO results = JsonConvert.DeserializeObject<ResultsResponseDTO>(result, settings);
+
+                return results;
             }
             catch (WebException ex)
             {
@@ -447,9 +502,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
 
 
 
-        public InsertResponseDTO AddDataToKobo (InsertFormDTO body, string form)
+        public InsertResponseDTO AddDataToKobo(InsertFormDTO body, string formID)
         {
-            string formID = _koboToolBoxHelper.GetKoboFormID(form);
 
             try
             {
@@ -550,7 +604,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        
+
     }
 }
 

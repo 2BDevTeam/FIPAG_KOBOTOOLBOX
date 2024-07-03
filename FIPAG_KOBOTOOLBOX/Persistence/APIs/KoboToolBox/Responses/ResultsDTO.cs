@@ -8,6 +8,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         public string start { get; set; }
         public string end { get; set; }
         public int _id { get; set; }
+        public int _idd { get; set; }
         public string _uuid { get; set; }
 
         [JsonProperty(PropertyName = "grupo1/cidade")]
@@ -69,15 +70,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
 
         [JsonProperty(PropertyName = "grupo3/Gostaria_de_ser_beneficiario_d")]
         public string DesejaSerBeneficiario { get; set; }
-        //public bool DesejaSerBeneficiario { get; set; }
 
         [JsonProperty(PropertyName = "grupo3/Tem_condicoes_para_p_o_de_ligacao_de_agua")]
         public string TemCondicoesLigacaoAgua { get; set; }
-        //public bool TemCondicoesLigacaoAgua { get; set; }
 
         [JsonProperty(PropertyName = "grupo3/Sente_que_tem_condic_stabelecida_a_liga_o")]
         public string SenteCondicoesEstabelecidasLigacaoAgua { get; set; }
-        //public bool SenteCondicoesEstabelecidasLigacaoAgua { get; set; }
 
         [JsonProperty(PropertyName = "grupo3/Qual_o_meio_de_pag_usar_para_pagar_gua")]
         public string MeioPagamentoAgua { get; set; }
@@ -85,10 +83,24 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.Responses
         [JsonProperty(PropertyName = "group4/adicionado_PHC")]
         public string adicionadoPHC { get; set; }
 
+        //[JsonProperty(PropertyName = "group4/localizacao")]
+        [JsonProperty(PropertyName = "group_od5ty14/localizacao")]
+        public string localizacao { get; set; }
+
         [JsonProperty(PropertyName = "group4/Nome_do_inquiridor")]
         public string nomeinquiridor { get; set; }
 
+        public ValidationStatus _validation_status { get; set; }
 
         public override string ToString() => JsonConvert.SerializeObject(this);
+    }
+
+
+
+    public partial class ValidationStatus
+    {
+        public string uid { get; set; }
+        public string by_whom { get; set; }
+        public string label { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
 {
-    public interface IKoboService
+    public interface ITestService
     {
         /*
         public ResponseDTO GetResult(string nome);

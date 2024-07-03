@@ -17,7 +17,7 @@ namespace FIPAG_KOBOTOOLBOX.Controllers
         {
             _koboService = koboService;
         }
-
+        /*
         [HttpGet]
         [Route("getData")]
         public async Task<ActionResult<ResponseDTO>> GetResult(string nome)
@@ -33,6 +33,7 @@ namespace FIPAG_KOBOTOOLBOX.Controllers
             var response = _koboService.RegistarCliente(id);
             return Ok(response);
         }
+        */
     }
 }
 

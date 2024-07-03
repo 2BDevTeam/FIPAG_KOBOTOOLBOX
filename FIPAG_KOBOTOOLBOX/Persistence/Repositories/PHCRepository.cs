@@ -8,111 +8,121 @@ using static System.Net.WebRequestMethods;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
-    public class PHCRepository : IPHCRepository
+    public class PHCRepository<TContext> : IPHCMainRepository<TContext> where TContext : DbContext
     {
-        private readonly AppDbContext _appDbContext;
 
-        public PHCRepository(AppDbContext appDbContext)
+        private readonly TContext _context;
+
+        public PHCRepository(TContext context)
         {
-            _appDbContext = appDbContext;
+            _context = context;
         }
+
 
         public List<Cl> GetClients()
         {
-            return _appDbContext.Cl.ToList();
+            return _context.Set<Cl>()
+                .ToList();
         }
 
         public Ft GetFt(string ftstamp)
         {
-            return _appDbContext.Ft.
+            return _context.Set<Ft>().
                 FirstOrDefault(ft => ft.Ftstamp == ftstamp);
         }
 
         public Ft2 GetFt2(string ft2stamp)
         {
-            return _appDbContext.Ft2.
+            return _context.Set<Ft2>().
                 FirstOrDefault(ft => ft.Ft2stamp == ft2stamp);
         }
 
         public List<Ligacoes> GetClNaoSincronizadosLigacoes()
         {
-            return _appDbContext.Cl2
-            .Join(_appDbContext.Cl,
+            return _context.Set<Cl2>()
+            .Join(_context.Set<Cl>(),
                   cl2 => cl2.Cl2stamp,
                   cl => cl.Clstamp,
                   (cl2, cl) => new { Cl2 = cl2, Cl = cl })
-               .Where(joined => joined.Cl.UKoboOri == true &&
+               .Where(joined => joined.Cl2.UKoboOri == true &&
                                 joined.Cl.Tipo == "1-Activo" &&
-                                joined.Cl.UKoboSync == false
+                                joined.Cl2.UKoboSync == false
                                 )
                .Select(joined => new Ligacoes
                {
                    Clstamp = joined.Cl.Clstamp,
                    No = (int)joined.Cl.No,
                    Nome = joined.Cl.Nome,
-                   IDBenefKobo = (int)joined.Cl.UKoboid,
-                   dataLigacao = joined.Cl2.UIniciof
+                   IDBenefKobo = (int)joined.Cl2.UKoboid,
+                   dataLigacao = joined.Cl2.UInicio,
+                   dataTermino = joined.Cl2.UTermino
                })
                .ToList();
         }
 
         public Ligacoes GetClNaoSincronizadosLigacoes(string clstamp)
         {
-#pragma warning disable CS8603 // Possible null reference return.
-            return _appDbContext.Cl2
-            .Join(_appDbContext.Cl,
+            return _context.Set<Cl2>()
+            .Join(_context.Set<Cl>(),
                   cl2 => cl2.Cl2stamp,
                   cl => cl.Clstamp,
                   (cl2, cl) => new { Cl2 = cl2, Cl = cl })
-               .Where(joined => joined.Cl.UKoboOri == true &&
-                                joined.Cl.Tipo == "1-Activo" &&
-                                joined.Cl.UKoboSync == false
-                                )
+               .Where(joined => joined.Cl.Clstamp == clstamp)
                .Select(joined => new Ligacoes
                {
                    Clstamp = joined.Cl.Clstamp,
                    No = (int)joined.Cl.No,
                    Nome = joined.Cl.Nome,
-                   IDBenefKobo = (int)joined.Cl.UKoboid,
-                   dataLigacao = joined.Cl2.UIniciof
+                   IDBenefKobo = (int)joined.Cl2.UKoboid,
+                   dataLigacao = joined.Cl2.UInicio,
+                   dataTermino = joined.Cl2.UTermino
                })
                .FirstOrDefault();
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public Cl GetClPorIdKobo(int idKobo)
+        public Cl2 GetCl2ByIdKobo(int idKobo)
         {
-            return _appDbContext.Cl
-                .FirstOrDefault(cl => cl.UKoboid == idKobo);
+            return _context.Set<Cl>()
+                .Join(_context.Set<Cl2>(),
+                      cl => cl.Clstamp,
+                      cl2 => cl2.Cl2stamp,
+                      (cl, cl2) => new { Cl = cl, Cl2 = cl2 })
+                .Where(joined => joined.Cl2.UKoboid == idKobo)
+                .Select(joined => joined.Cl2)
+                .FirstOrDefault();
         }
 
-
-        public List<USyncQueue> GetUSyncQueue()
+        public Cl2 GetCl2ByStamp(string cl2stamp)
         {
-            return _appDbContext.USyncqueue
-               .ToList();
+            return _context.Set<Cl2>()
+                .Where(joined => joined.Cl2stamp == cl2stamp)
+                .FirstOrDefault();
         }
 
 
         public List<Consumos> GetConsumos()
         {
-            DateTime today = DateTime.Today;
-            DateTime specificDate = new DateTime(2024, 5, 27);
+            //DateTime today = DateTime.Today;
+            //DateTime specificDate = new DateTime(2024, 5, 27);
 
-            return _appDbContext.Ft
-                .Join(_appDbContext.Cl,
+            return _context.Set<Ft>()
+                .Join(_context.Set<Cl>(),
                       ft => ft.No,
                       cl => cl.No,
                       (ft, cl) => new { Ft = ft, Cl = cl })
-                .Join(_appDbContext.Ft3,
+                .Join(_context.Set<Ft3>(),
                       joined => joined.Ft.Ftstamp,
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
-                .Join(_appDbContext.Ft2,
-                      joined => joined.Ft.Ftstamp, 
+                .Join(_context.Set<Ft2>(),
+                      joined => joined.Ft.Ftstamp,
                       ft2 => ft2.Ft2stamp,
                       (joined, ft2) => new { joined.Ft, joined.Cl, joined.Ft3, Ft2 = ft2 })
-                .Where(joined => joined.Cl.UKoboOri == true &&
+                .Join(_context.Set<Cl2>(),
+                      joined => joined.Cl.Clstamp,
+                      cl2 => cl2.Cl2stamp,
+                      (joined, cl2) => new { joined.Ft, joined.Cl, joined.Ft3, joined.Ft2, Cl2 = cl2 })
+                .Where(joined => joined.Cl2.UKoboOri == true &&
                                  joined.Ft2.UKobosync == false &&
                                  joined.Ft.Ndoc == 1)
                 .Select(joined => new Consumos
@@ -121,7 +131,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                     Clstamp = joined.Cl.Clstamp,
                     No = (int)joined.Ft.No,
                     Nome = joined.Ft.Nome,
-                    IDBenefKobo = (int)joined.Cl.UKoboid,
+                    IDBenefKobo = (int)joined.Cl2.UKoboid,
                     Nmdoc = joined.Ft.Nmdoc,
                     Fno = (int)joined.Ft.Fno,
                     TotalMeticais = joined.Ft.Total,
@@ -138,21 +148,24 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         }
 
 
-        public Consumos GetConsumo(string ftstamp )
+        public Consumos GetConsumo(string ftstamp)
         {
             DateTime today = DateTime.Today;
             DateTime specificDate = new DateTime(2024, 5, 27);
 
-#pragma warning disable CS8603 // Possible null reference return.
-            return _appDbContext.Ft
-                .Join(_appDbContext.Cl,
+            return _context.Set<Ft>()
+                .Join(_context.Set<Cl>(),
                       ft => ft.No,
                       cl => cl.No,
                       (ft, cl) => new { Ft = ft, Cl = cl })
-                .Join(_appDbContext.Ft3,
+                .Join(_context.Set<Ft3>(),
                       joined => joined.Ft.Ftstamp,
                       ft3 => ft3.Ft3stamp,
                       (joined, ft3) => new { joined.Ft, joined.Cl, Ft3 = ft3 })
+                .Join(_context.Set<Cl2>(),
+                      joined => joined.Cl.Clstamp,
+                      cl2 => cl2.Cl2stamp,
+                      (joined, cl2) => new { joined.Ft, joined.Cl, joined.Ft3, Cl2 = cl2 })
                 .Where(joined => joined.Ft.Ftstamp == ftstamp)
                 .Select(joined => new Consumos
                 {
@@ -160,7 +173,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                     Clstamp = joined.Cl.Clstamp,
                     No = (int)joined.Ft.No,
                     Nome = joined.Ft.Nome,
-                    IDBenefKobo = (int)joined.Cl.UKoboid,
+                    IDBenefKobo = (int)joined.Cl2.UKoboid,
                     Nmdoc = joined.Ft.Nmdoc,
                     Fno = (int)joined.Ft.Fno,
                     TotalMeticais = joined.Ft.Total,
@@ -174,19 +187,50 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                     Anomalia = joined.Ft3.UAnomal
                 })
                 .FirstOrDefault();
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
 
         public decimal GetNoEm()
         {
-            return _appDbContext.Em
+            return _context.Set<Em>()
                          .Select(em => em.No)
                          .ToList()
                          .DefaultIfEmpty(0)
                          .Max() + 1;
         }
 
+        public void DeleteLiftqueue(USyncQueue syncQueue)
+        {
+            _context.Set<USyncQueue>().Remove(syncQueue);
+        }
+
+        public UBasedados GetBaseDados(string nomeBd)
+        {
+            return _context.Set<UBasedados>()
+               .FirstOrDefault(bd => bd.Nomebd == nomeBd);
+        }
+
+        public List<ULibasedado> GetLiBaseDados(string Basedadosstamp)
+        {
+            return _context.Set<ULibasedado>()
+                .Where(bd => bd.Basedadosstamp == Basedadosstamp)
+               .ToList();
+        }
+
+        public ULibasedado GetFormID(string nome, string bdstamp)
+        {
+            return _context.Set<ULibasedado>()
+            .Where(f => f.Subnome == nome
+                    && f.Basedadosstamp == bdstamp)
+            .ToList().FirstOrDefault();
+        }
+
+
+        public Cl GetClByNo(int no)
+        {
+            return _context.Set<Cl>()
+                .FirstOrDefault(bd => bd.No == no);
+        }
 
     }
 }

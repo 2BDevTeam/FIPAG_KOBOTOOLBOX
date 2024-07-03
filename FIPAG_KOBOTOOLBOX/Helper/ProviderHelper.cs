@@ -8,7 +8,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
     {
         public List<UProvider> getProviderData(decimal providerCode)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -16,12 +16,12 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
             var config = configuration.Build();
-            var connString = config.GetConnectionString("DBConnect");
+            var connString = config.GetConnectionString("DBconnect_OnBD_FIPAG");
             optionsBuilder.UseSqlServer(connString);
 
 
 
-            using (AppDbContext context = new AppDbContext(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
 
                 return context.UProvider.Where(provider => provider.codigo == providerCode).ToList();
@@ -29,7 +29,7 @@ namespace FIPAG_KOBOTOOLBOX.Helper
         }
         public List<UProvider> getProviderByGroup(decimal providerCode,string grupo)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContextMain>();
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile($"appsettings.json");
@@ -37,12 +37,12 @@ namespace FIPAG_KOBOTOOLBOX.Helper
 
 
             var config = configuration.Build();
-            var connString = config.GetConnectionString("DBConnect");
+            var connString = config.GetConnectionString("DBconnect_OnBD_FIPAG");
             optionsBuilder.UseSqlServer(connString);
 
 
 
-            using (AppDbContext context = new AppDbContext(optionsBuilder.Options))
+            using (AppDbContextMain context = new AppDbContextMain(optionsBuilder.Options))
             {
 
                 return context.UProvider.Where(provider => provider.codigo == providerCode &&provider.grupo==grupo).ToList();

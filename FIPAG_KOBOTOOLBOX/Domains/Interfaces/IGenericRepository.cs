@@ -1,11 +1,11 @@
 ﻿//using FIPAG_KOBOTOOLBOX.Persistence.Contexts;
 
+using Microsoft.EntityFrameworkCore;
+
 namespace FIPAG_KOBOTOOLBOX.Domains.Interface
 {
-    public interface IGenericRepository
+    public interface IGenericRepository<TContext> where TContext : DbContext
     {
-       // public void DynamicContextUpsertEntity<T>(T entity, string keyToExclude, List<KeyValuePair<string, object>> conditions, DynamicContext context, bool saveChanges) where T : class;
-        
         public void UpsertEntity<T>(T entity,List<string> keysToExclude, List<KeyValuePair<string, object>> conditions, bool saveChanges) where T : class;
         public void Add<T>(T entity) where T : class;
 

@@ -9,5 +9,6 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public string Nome{ get; set; }
         public int IDBenefKobo { get; set; }
         public DateTime dataLigacao { get; set; }
+        public DateTime dataTermino { get; set; }
     }
 }

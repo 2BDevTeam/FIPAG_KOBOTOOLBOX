@@ -33,22 +33,31 @@ ConversionExtension conversionExtension = new ConversionExtension();
 
 ConfigurationManager configuration = builder.Configuration;
 
-//builder.Services.AddDbContext<SGOFCTX>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect")));
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<AppDbContextMain>(options =>
 {
-    options.UseSqlServer(configuration.GetConnectionString("DBconnect"),
+    options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG"),
 
         sqlServerOptions => sqlServerOptions.CommandTimeout(120));
 });
-builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect")));
+builder.Services.AddDbContext<AuthAppContext>(options => options.UseSqlServer(configuration.GetConnectionString("DBconnect_OnBD_FIPAG")));
+
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<AuthAppContext>()
     .AddDefaultTokenProviders();
 
-builder.Services.AddScoped<IGenericRepository, GenericRepository>();
-builder.Services.AddScoped<IPHCRepository, PHCRepository>();
+//builder.Services.AddScoped<IGenericRepository, GenericRepository>();
+
+builder.Services.AddScoped<IGenericRepository<AppDbContextMain>, GenericRepository<AppDbContextMain>>();
+
+
+builder.Services.AddScoped<IPHCMainRepository<AppDbContextMain>, PHCRepository<AppDbContextMain>>();
+builder.Services.AddScoped<IPHCRepository2<DynamicContext>, PHCRepository2<DynamicContext>>();
 builder.Services.AddScoped<IKoboService, KOBOService>();
+builder.Services.AddScoped<ITestService, TestService>();
+
+
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -113,7 +122,7 @@ builder.Services.AddInMemoryRateLimiting();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMvcCore().AddApiExplorer();
-builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect"), new SqlServerStorageOptions
+builder.Services.AddHangfire(configuration => configuration.UseSqlServerStorage(builder.Configuration.GetConnectionString("DBconnect_OnBD_FIPAG"), new SqlServerStorageOptions
 {
     SchemaName = "SFGOFHANGFIRE",
 
@@ -153,7 +162,7 @@ app.UseHangfireDashboard("/Jobs");
 // Configure the root path ("/") to return the HTML file
 app.UseDefaultFiles();
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAuthentication();
