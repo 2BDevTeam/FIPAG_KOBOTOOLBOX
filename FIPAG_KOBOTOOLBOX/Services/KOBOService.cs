@@ -199,7 +199,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueCl)
                     {
-                        //ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -218,7 +218,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     foreach (var sq in syncQueueFt)
                     {
-                        //ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                        ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -330,7 +330,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     _phcDynamicRepository.Add(dynamicContext, em);
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
-
+                    
                     emNo++;
                 }
 

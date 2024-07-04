@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 {
@@ -109,10 +110,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab)
         {
+            DateTime today = DateTime.Today;
+            DateTime yesterday= today.AddDays(-1);
 
             return _context.Set<USyncQueue>()
                 .Where(sq=> sq.Nometabela == nomeTab
-                        && sq.Ousrdata.Date != DateTime.Now.Date
+                        && sq.Ousrdata.Date != today
+                        && sq.Ousrdata.Date != yesterday
                         )
                .ToList();
         }
