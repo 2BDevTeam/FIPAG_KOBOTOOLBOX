@@ -598,9 +598,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
             catch (Exception ex)
             {
                 var errorDTO = new ErrorDTO { message = ex?.Message, stack = ex?.StackTrace?.ToString(), inner = ex?.InnerException?.ToString() + "  " };
-                Debug.Print($"SyncFactura ERROR DTO {errorDTO}");
+                Debug.Print($"SyncLigação ERROR DTO {errorDTO}");
                 var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
-                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncFactura", errorDTO?.ToString());
+                logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncLigação", errorDTO?.ToString());
             }
         }
 
