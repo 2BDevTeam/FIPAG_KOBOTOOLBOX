@@ -433,6 +433,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 var data = cons.Fdata.ToString("yyyy-MM-dd") + "T00:00:00+02:00";
 
+                var nome = cons.Nome.Trim().Replace("\u0002", string.Empty);
+
                 InsertFormDTO body = new()
                 {
                     id = "",
@@ -450,7 +452,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         Group1Consumos = new Group1Consumos
                         {
                             no = cons.No,
-                            nome = cons.Nome.Trim(),
+                            nome = nome,
                             IDBenefKobo = cons.IDBenefKobo
                         },
                         Group2Consumos = new Group2Consumos
