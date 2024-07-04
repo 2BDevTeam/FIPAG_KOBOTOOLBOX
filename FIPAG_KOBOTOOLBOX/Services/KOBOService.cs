@@ -221,7 +221,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
-
+                    
                     break;
 
                 default: break;

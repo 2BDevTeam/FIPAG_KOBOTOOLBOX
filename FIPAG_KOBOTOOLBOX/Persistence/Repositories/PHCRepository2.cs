@@ -115,7 +115,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
             return _context.Set<USyncQueue>()
                 .Where(sq=> sq.Nometabela == nomeTab
-                        && sq.Ousrdata.Date != today
+                        //&& sq.Ousrdata.Date != today
                         && sq.Ousrdata.Date != yesterday
                         )
                .ToList();
