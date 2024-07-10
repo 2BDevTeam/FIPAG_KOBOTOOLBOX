@@ -614,7 +614,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public void AddChangesSyncReport(int koboId, int no, string motivo, DynamicContext dynamicContext, USyncQueue usync)
+        public void AddChangesSyncReport(long koboId, long no, string motivo, DynamicContext dynamicContext, USyncQueue usync)
         {
             try
             {

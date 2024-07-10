@@ -10,7 +10,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
         public string DataLigacao { get; set; }
 
         [JsonProperty(PropertyName = "ID_Benef_Kobo")]
-        public int IDBenefKobo { get; set; }
+        public long IDBenefKobo { get; set; }
 
         public string EstadoLigacao { get; set; }
     }

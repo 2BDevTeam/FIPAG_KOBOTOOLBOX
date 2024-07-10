@@ -11,7 +11,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
         public List<Consumos> GetConsumos(TContext _context);
         public Consumos GetConsumo(TContext _context, string ftstamp);
         public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab);
-        public Cl2 GetCl2PorIdKobo(TContext _context,int idKobo);
+        public Cl2 GetCl2PorIdKobo(TContext _context,long idKobo);
         public Cl2 GetCl2PorStamp(TContext _context, string cl2stamp);
         public Ft GetFt(TContext _context, string ftstamp);
         public Ft2 GetFt2(TContext _context, string ft2stamp);

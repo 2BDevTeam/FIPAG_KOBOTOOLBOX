@@ -146,7 +146,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                     {
                         payload = new PayloadFormDTO
                         {
-                            submission_ids = new List<int> { id },
+                            submission_ids = new List<long> { id },
                             data = new DataFormDTO
                             {
                                 adicionado_PHC = "true"
@@ -210,7 +210,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
             }
         }
 
-        public UpdateResponseDTO UpdIsClientePHC(int id, string formID)
+        public UpdateResponseDTO UpdIsClientePHC(long id, string formID)
         {
             try
             {
@@ -225,7 +225,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                     {
                         payload = new PayloadFormDTO
                         {
-                            submission_ids = new List<int> { id },
+                            submission_ids = new List<long> { id },
                             data = new DataFormDTO
                             {
                                 isCliente = "true"
@@ -309,7 +309,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox
                     {
                         payload = new PayloadFormDTO
                         {
-                            submission_ids = new List<int> { id },
+                            submission_ids = new List<long> { id },
                             data = new DataFormDTO
                             {
                                 EstadoLigacao = estado

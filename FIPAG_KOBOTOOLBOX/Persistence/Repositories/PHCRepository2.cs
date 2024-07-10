@@ -89,7 +89,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                .FirstOrDefault();
         }
 
-        public Cl2 GetCl2PorIdKobo(TContext _context, int idKobo)
+        public Cl2 GetCl2PorIdKobo(TContext _context, long idKobo)
         {
             return _context.Set<Cl>()
                 .Join(_context.Set<Cl2>(),

@@ -9,7 +9,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
 
     public class PayloadFormDTO
     {
-        public List<int> submission_ids { get; set; }
+        public List<long> submission_ids { get; set; }
 
         public DataFormDTO data { get; set; }
     }
