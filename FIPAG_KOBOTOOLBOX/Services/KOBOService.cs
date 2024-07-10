@@ -206,8 +206,10 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     break;
 
                 case "Levantamento":
+                    /*
                     if (formulario.FormCidade == cidade)
                         AdicionarLevantamentoBeneficiarios(formulario.Formid, cidade, dynamicContext);
+                    */
                     break;
 
                 case "Consumo":
@@ -244,7 +246,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
-                throw new Exception($"Dadossss {formID}");
 
                 var emNo = _phcDynamicRepository.GetNoEm(dynamicContext);
 
