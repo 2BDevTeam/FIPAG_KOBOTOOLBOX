@@ -206,10 +206,10 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     break;
 
                 case "Levantamento":
-
+                    /*
                     if (formulario.FormCidade == cidade)
                         AdicionarLevantamentoBeneficiarios(formulario.Formid, cidade, dynamicContext);
-
+                    */
                     break;
 
                 case "Consumo":
