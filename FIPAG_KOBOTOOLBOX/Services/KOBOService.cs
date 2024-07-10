@@ -424,7 +424,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred: {ex.Message}");
+                Debug.Print($"An error occurred: {ex.Message}");
             }
         }
 
