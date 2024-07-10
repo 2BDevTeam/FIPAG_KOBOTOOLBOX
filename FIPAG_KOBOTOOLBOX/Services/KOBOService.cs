@@ -188,7 +188,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         public async Task SincrinizarDadosUSyncQueue(ULibasedado formulario, string cidade, DynamicContext dynamicContext)
         {
-            Debug.Print($"SincrinizarDadosUSyncQueue    {formulario.Subnome} - {formulario.FormCidade}");
+            Debug.Print($"SincronizarDadosUSyncQueue    {formulario.Subnome} - {formulario.FormCidade}");
 
             switch (formulario.Subnome)
             {
@@ -221,7 +221,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
-                    
+
                     break;
 
                 default: break;
@@ -331,7 +331,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     _phcDynamicRepository.Add(dynamicContext, em);
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
-                    
+
                     emNo++;
                 }
 
@@ -399,26 +399,35 @@ namespace FIPAG_KOBOTOOLBOX.Services
         {
             Debug.Print($"ProcessClienteUpd ");
             //var cl2 = _phcDynamicRepository.GetCl2PorStamp(dynamicContext, stamp);
-
-            switch (campo)
+            try
             {
-                case "tipo":
-                    var li = _phcDynamicRepository.GetClNaoSincronizadosLigacoes(dynamicContext, stamp);
+                switch (campo)
+                {
+                    case "tipo":
+                        var li = _phcDynamicRepository.GetClNaoSincronizadosLigacoes(dynamicContext, stamp);
 
-                    if (valor == "1-Activo")
-                    {
-                        SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
-                    }
-                    else if (valor == "2-Suspenso" || valor == "3-Rescindido")
-                    {
-                        li.dataLigacao = li.dataTermino;
-                        SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
-                    }
+                        if (valor == "1-Activo")
+                        {
+                            SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
+                        }
+                        else if (valor == "2-Suspenso" || valor == "3-Rescindido")
+                        {
+                            li.dataLigacao = li.dataTermino;
+                            SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
+                        }
 
-                    break;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as needed
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                // Optionally, you can rethrow the exception if you want it to propagate
+                // throw;
             }
         }
 
