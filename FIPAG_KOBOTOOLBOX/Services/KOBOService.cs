@@ -246,6 +246,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 Debug.Print($"Beneficiarios nao adicionados PHC {dados.results.Count}");
 
+                throw new Exception($"Dadossss {formID}");
+
                 var emNo = _phcDynamicRepository.GetNoEm(dynamicContext);
 
                 foreach (var dado in dados.results)
