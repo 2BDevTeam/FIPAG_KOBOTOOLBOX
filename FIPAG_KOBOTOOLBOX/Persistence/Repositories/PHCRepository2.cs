@@ -118,7 +118,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                         //&& sq.Ousrdata.Date != today
                         //&& sq.Ousrdata.Date != yesterday
                         )
-                .Take(50)
+                .Take(250)
                .ToList();
         }
 
