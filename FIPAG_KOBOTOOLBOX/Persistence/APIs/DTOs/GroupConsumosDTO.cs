@@ -5,10 +5,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
 
     public class Group1Consumos
     {
-        public int no{ get; set; }
+        public long no{ get; set; }
         public string nome{ get; set; }
         [JsonProperty(PropertyName = "ID_Benef_Kobo")]
-        public int IDBenefKobo { get; set; }
+        public long IDBenefKobo { get; set; }
     }
 
     public class Group2Consumos

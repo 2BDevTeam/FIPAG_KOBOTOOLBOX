@@ -193,9 +193,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 {
                     Ftstamp = joined.Ft.Ftstamp,
                     Clstamp = joined.Cl.Clstamp,
-                    No = (int)joined.Ft.No,
+                    No = (long)joined.Ft.No,
                     Nome = joined.Ft.Nome,
-                    IDBenefKobo = (int)joined.Cl2.UKoboid,
+                    IDBenefKobo = (long)joined.Cl2.UKoboid,
                     Nmdoc = joined.Ft.Nmdoc,
                     Fno = (int)joined.Ft.Fno,
                     TotalMeticais = joined.Ft.Total,
