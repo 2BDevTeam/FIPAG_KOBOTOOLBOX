@@ -80,9 +80,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                .Select(joined => new Ligacoes
                {
                    Clstamp = joined.Cl.Clstamp,
-                   No = (int)joined.Cl.No,
+                   No = (long)joined.Cl.No,
                    Nome = joined.Cl.Nome,
-                   IDBenefKobo = (int)joined.Cl2.UKoboid,
+                   IDBenefKobo = (long)joined.Cl2.UKoboid,
                    dataLigacao = joined.Cl2.UInicio,
                    dataTermino = joined.Cl2.UTermino
                })
