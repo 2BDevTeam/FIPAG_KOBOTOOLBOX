@@ -424,10 +424,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as needed
                 Console.WriteLine($"An error occurred: {ex.Message}");
-                // Optionally, you can rethrow the exception if you want it to propagate
-                // throw;
             }
         }
 
