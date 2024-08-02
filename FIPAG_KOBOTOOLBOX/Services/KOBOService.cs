@@ -302,6 +302,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UBilocal = dado.LocalEmissaoBI,
                         Telefone = dado.telefone,
                         Ncont = dado.nuit,
+                        Segmento= "Doméstico",
                         Pncont = "MZ",
                         Ousrinis = "FIKOBOWS",
                         UOrigem = "KoboToolbox",
