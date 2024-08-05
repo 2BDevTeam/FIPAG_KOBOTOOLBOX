@@ -166,7 +166,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var dynamicContext = new DynamicContext(connectionString);
 
 
-
                 foreach (var formulario in formularios)
                 {
 
@@ -257,10 +256,11 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     var localiz = new string[] { "0", "0", "0", "0" };
 
                     if (dado.localizacao != null)
-                    {
                         localiz = dado.localizacao.Split(' ');
-                    }
 
+                    if (dado.localizacao2 != null)
+                        localiz = dado.localizacao2.Split(' ');
+                    
                     var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));
 
                     var quarteirao = dado.Quarteirao;
