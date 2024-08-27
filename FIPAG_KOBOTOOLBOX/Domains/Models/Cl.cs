@@ -5,6 +5,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
 {
     public partial class Cl
     {
+
         public string Clstamp { get; set; } = null!;
         public string Nome { get; set; } = null!;
         public decimal No { get; set; }
@@ -27,5 +28,13 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public bool Marcada { get; set; }
         public bool Inactivo { get; set; }
         public string Id { get; set; } = null!;
+        public DateTime Nascimento { get; set; }
+        public string Bino { get; set; } = null!;
+        public DateTime Bidata { get; set; }
+        public string Tlmvl { get; set; } = null!;
+        public string Bilocal { get; set; } = null!;
+        public string Ncont { get; set; } = null!;
+
+        
     }
 }

@@ -108,15 +108,22 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 .FirstOrDefault();
         }
 
-        public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab)
+        public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab, string campo)
         {
-            DateTime today = DateTime.Today;
-            DateTime yesterday= today.AddDays(-1);
 
             return _context.Set<USyncQueue>()
                 .Where(sq=> sq.Nometabela == nomeTab
-                        //&& sq.Ousrdata.Date != today
-                        //&& sq.Ousrdata.Date != yesterday
+                        && sq.campo== campo
+                        )
+                .Take(350)
+               .ToList();
+        }
+
+        public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab)
+        {
+
+            return _context.Set<USyncQueue>()
+                .Where(sq => sq.Nometabela == nomeTab
                         )
                 .Take(350)
                .ToList();
@@ -227,10 +234,41 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             _context.Set<USyncQueue>().Remove(syncQueue);
         }
 
+        public Em GetEm(TContext _context, int no)
+        {
+            return _context.Set<Em>()
+                        .Where(em => em.No == no)
+                        .ToList()
+                        .FirstOrDefault();
+        }
 
+        public Cl GetClPorNo(TContext _context, int no)
+        {
+            return _context.Set<Cl>()
+                        .Where(cl => cl.No == no)
+                        .ToList()
+                        .FirstOrDefault();
+        }
 
+        public Cliente GetCliente(TContext _context, string stamp)
+        {
+            var query = from cl in _context.Set<Cl>()
+                        join cl2 in _context.Set<Cl2>() on cl.Clstamp equals cl2.Cl2stamp
+                        where cl.Clstamp == stamp
+                        select new Cliente { cl = cl, cl2 = cl2 };
 
+            return query.FirstOrDefault();
+        }
 
+        public Cliente GetCliente(TContext _context, int no)
+        {
+            var query = from cl in _context.Set<Cl>()
+                        join cl2 in _context.Set<Cl2>() on cl.Clstamp equals cl2.Cl2stamp
+                        where cl.No == no
+                        select new Cliente { cl = cl, cl2 = cl2 };
+
+            return query.FirstOrDefault();
+        }
 
 
 

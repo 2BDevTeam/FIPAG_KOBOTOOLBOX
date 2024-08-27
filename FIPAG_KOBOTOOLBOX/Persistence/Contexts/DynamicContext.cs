@@ -1408,15 +1408,20 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                 entity.HasIndex(e => new { e.Nome, e.Nome2, e.No, e.Estab, e.Clstamp }, "in_cl_cllist")
                     .HasFillFactor(70);
 
+                entity.HasIndex(e => e.Ncont, "in_cl_ncont")
+                    .HasFillFactor(70);
+
                 entity.HasIndex(e => e.No, "in_cl_no")
                     .HasFillFactor(70);
 
                 entity.HasIndex(e => e.Nome, "in_cl_nome")
                     .HasFillFactor(70);
 
+
                 entity.HasIndex(e => e.Clstamp, "in_cl_stamp")
                     .IsUnique()
                     .HasFillFactor(70);
+
 
                 entity.Property(e => e.No)
                     .HasColumnType("numeric(10, 0)")
@@ -1426,6 +1431,23 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnType("numeric(3, 0)")
                     .HasColumnName("estab");
 
+                entity.Property(e => e.Bidata)
+                    .HasColumnType("datetime")
+                    .HasColumnName("bidata")
+                    .HasDefaultValueSql("(CONVERT([datetime],'19000101',0))");
+
+                entity.Property(e => e.Bilocal)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("bilocal")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Bino)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("bino")
+                    .HasDefaultValueSql("('')");
+
                 entity.Property(e => e.Clstamp)
                     .HasMaxLength(25)
                     .IsUnicode(false)
@@ -1433,17 +1455,20 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasDefaultValueSql("('')")
                     .IsFixedLength();
 
+
                 entity.Property(e => e.Fref)
                     .HasMaxLength(20)
                     .IsUnicode(false)
                     .HasColumnName("fref")
                     .HasDefaultValueSql("('')");
 
+
                 entity.Property(e => e.Id)
                     .HasMaxLength(20)
                     .IsUnicode(false)
                     .HasColumnName("id")
                     .HasDefaultValueSql("('')");
+
 
                 entity.Property(e => e.Inactivo).HasColumnName("inactivo");
 
@@ -1461,10 +1486,21 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("morada")
                     .HasDefaultValueSql("('')");
 
+                entity.Property(e => e.Nascimento)
+                    .HasColumnType("datetime")
+                    .HasColumnName("nascimento")
+                    .HasDefaultValueSql("(CONVERT([datetime],'19000101',0))");
+
                 entity.Property(e => e.Naturalid)
                     .HasMaxLength(17)
                     .IsUnicode(false)
                     .HasColumnName("naturalid")
+                    .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Ncont)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("ncont")
                     .HasDefaultValueSql("('')");
 
                 entity.Property(e => e.Nib)
@@ -1502,6 +1538,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .HasColumnName("ousrinis")
                     .HasDefaultValueSql("('')");
 
+
                 entity.Property(e => e.Segmento)
                     .HasMaxLength(25)
                     .IsUnicode(false)
@@ -1513,6 +1550,14 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .IsUnicode(false)
                     .HasColumnName("tipo")
                     .HasDefaultValueSql("('')");
+
+                entity.Property(e => e.Tlmvl)
+                    .HasMaxLength(45)
+                    .IsUnicode(false)
+                    .HasColumnName("tlmvl")
+                    .HasDefaultValueSql("('')");
+
+
 
                 entity.Property(e => e.Usrdata)
                     .HasColumnType("datetime")
@@ -1530,6 +1575,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                     .IsUnicode(false)
                     .HasColumnName("usrinis")
                     .HasDefaultValueSql("('')");
+
 
                 entity.Property(e => e.Zona)
                     .HasMaxLength(20)

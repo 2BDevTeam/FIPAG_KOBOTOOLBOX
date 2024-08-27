@@ -24,6 +24,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
 
         [JsonProperty(PropertyName = "Data_da_Fatura")]
         public string fdata { get; set; }
+
+        [JsonProperty(PropertyName = "Anulada")]
+        public string anulado { get; set; }
     }
 
     public class Group3Consumos

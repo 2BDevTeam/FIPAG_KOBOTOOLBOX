@@ -22,6 +22,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Models
         public string Ctact2tel { get; set; } = null!;
         public string Ctact3tel { get; set; } = null!;
         public string Url { get; set; } = null!;
+        public string Tlmvl { get; set; } = null!;
         public string Segmento { get; set; } = null!;
         public string Area { get; set; } = null!;
         public string Ousrinis { get; set; } = null!;

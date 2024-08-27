@@ -8,8 +8,12 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
 
         public List<Bo> GetBoTeste(TContext _context);
         public List<Cl> GetClients(TContext _context);
+        public Cl GetClPorNo(TContext _context, int no);
+        public Cliente GetCliente(TContext _context, string stamp);
+        public Cliente GetCliente(TContext _context, int no);
         public List<Consumos> GetConsumos(TContext _context);
         public Consumos GetConsumo(TContext _context, string ftstamp);
+        public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab, string campo);
         public List<USyncQueue> GetUSyncQueue(TContext _context, string nomeTab);
         public Cl2 GetCl2PorIdKobo(TContext _context,long idKobo);
         public Cl2 GetCl2PorStamp(TContext _context, string cl2stamp);
@@ -17,6 +21,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
         public Ft2 GetFt2(TContext _context, string ft2stamp);
         public List<Ligacoes> GetClNaoSincronizadosLigacoes(TContext _context);
         public Ligacoes GetClNaoSincronizadosLigacoes(TContext _context, string clstamp);
+        public Em GetEm(TContext _context, int no);
         public decimal GetNoEm(TContext _context);
         public void DeleteSyncQueue(TContext _context, USyncQueue syncQueue);
 

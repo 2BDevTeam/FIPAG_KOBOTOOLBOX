@@ -193,12 +193,12 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 case "Ligação":
 
-                    var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl");
+                    var syncQueueCl = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl", "tipo");
                     Debug.Print($"TOTAL DE Ligações DA BD {formulario.Basedadosstamp} POR SINCRONIZAR {syncQueueCl.Count()}");
 
                     foreach (var sq in syncQueueCl)
                     {
-                        ProcessCliente(sq, sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario.Basedadosstamp, dynamicContext);
+                        ProcessSyncDados(sq, "cl", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -206,10 +206,25 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 case "Levantamento":
                     if (formulario.FormCidade == cidade)
+                    {
                         AdicionarLevantamentoBeneficiarios(formulario.Formid, cidade, dynamicContext);
+
+                        var syncQueueEm = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "em", "no");
+                        foreach (var sq in syncQueueEm)
+                        {
+                            ProcessSyncDados(sq,"em", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
+                        }
+                        var syncQueueCl1 = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl", "no");
+                        foreach (var sq in syncQueueCl1)
+                        {
+                            ProcessSyncDados(sq, "cl", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
+                        }
+
+                        _phcDynamicRepository.SaveChanges(dynamicContext);
+
+                    }
+
                     break;
-                    /*
-                    */
 
                 case "Consumo":
                     var syncQueueFt = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft");
@@ -218,6 +233,13 @@ namespace FIPAG_KOBOTOOLBOX.Services
                     foreach (var sq in syncQueueFt)
                     {
                         ProcessFatura(sq, sq.Stamptabela, sq.Accao, formulario.Formid, dynamicContext);
+                    }
+                    _phcDynamicRepository.SaveChanges(dynamicContext);
+
+                    var syncQueueFt1 = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "ft", "anulado");
+                    foreach (var sq in syncQueueFt1)
+                    {
+                        ProcessSyncDados(sq, "ft", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
                     }
                     _phcDynamicRepository.SaveChanges(dynamicContext);
 
@@ -260,7 +282,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                     if (dado.localizacao2 != null)
                         localiz = dado.localizacao2.Split(' ');
-                    
+
                     var lBairro = dado.Bairro.Substring(0, Math.Min(dado.Bairro.Length, 12));
 
                     var quarteirao = dado.Quarteirao;
@@ -300,9 +322,9 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         UBidata = dado.DataEmissaoBI,
                         UBino = dado.NrBi,
                         UBilocal = dado.LocalEmissaoBI,
-                        Telefone = dado.telefone,
+                        Tlmvl = dado.telefone,
                         Ncont = dado.nuit,
-                        Segmento= "Doméstico",
+                        Segmento = "Doméstico",
                         Pncont = "MZ",
                         Ousrinis = "FIKOBOWS",
                         UOrigem = "KoboToolbox",
@@ -352,6 +374,144 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
+        public void ActualizarDadosEm(USyncQueue usync, ULibasedado formulario, string no, DynamicContext dynamicContext)
+        {
+
+            try
+            {
+                int emno = int.Parse(no);
+                var em = _phcDynamicRepository.GetEm(dynamicContext, emno);
+
+                UpdateFormDTO body = new()
+                {
+                    payload = new PayloadFormDTO
+                    {
+                        submission_ids = new List<long> { (long) em.UKoboid },
+                        data = new DataFormDTO
+                        {
+                            nome_chefe_af=em.Nome,
+                            DataDeNascimento=em.UNascimen,
+                            DataEmissaoBI=em.UBidata,
+                            NrBi=em.UBino,
+                            LocalEmissaoBI = em.UBilocal,
+                            telefone = em.Tlmvl,
+                            nuit = em.Ncont,
+                            ncasa = em.UNcasa.ToString()
+                        }
+                    },
+                };
+
+                var upd = koboAPI.UpdDataForm(body, formulario.Formid) ?? throw new Exception("Erro ao actualizar dados");
+
+                if (upd.successes != 1)
+                    throw new Exception("Erro ao actualizar dados");
+
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+
+                _phcDynamicRepository.SaveChanges(dynamicContext);
+            }
+            catch (DbUpdateException ex)
+            {
+                Debug.Print("An error occurred while updating the database.");
+                Debug.Print($"Error: {ex.InnerException?.Message ?? ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"ERRO AO AdicionarLevantamentoBeneficiarios {ex.Message}");
+            }
+
+        }
+
+
+        public void ActualizarDadosFt(USyncQueue usync, string stamp, string campo, string valor, ULibasedado formulario, DynamicContext dynamicContext)
+        {
+            try
+            {
+                var ft = _phcDynamicRepository.GetFt(dynamicContext, stamp);
+                var cl = _phcDynamicRepository.GetCliente(dynamicContext, (int) ft.No);
+
+                UpdateFormDTO body = new()
+                {
+                    payload = new PayloadFormDTO
+                    {
+                        submission_ids = new List<long> { (long)cl.cl2.UKoboid },
+                        data = new DataFormDTO
+                        {
+                            anulada = ft.Anulado ? "true":"false",
+                        }
+                    },
+                };
+
+                var upd = koboAPI.UpdDataForm(body, formulario.Formid) ?? throw new Exception("Erro ao actualizar dados");
+
+                if (upd.successes != 1)
+                    throw new Exception("Erro ao actualizar dados");
+
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+
+                _phcDynamicRepository.SaveChanges(dynamicContext);
+            }
+            catch (DbUpdateException ex)
+            {
+                Debug.Print($"Error: {ex.InnerException?.Message ?? ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"ERRO AO ActualizarDadosFt {ex.Message}");
+            }
+
+        }
+
+        public void ActualizarDadosCl(USyncQueue usync, ULibasedado formulario, string stamp, DynamicContext dynamicContext)
+        {
+            
+            try
+            {
+                var cliente = _phcDynamicRepository.GetCliente(dynamicContext, stamp);
+
+                UpdateFormDTO body = new()
+                {
+                    payload = new PayloadFormDTO
+                    {
+                        submission_ids = new List<long> { (long)cliente.cl2.UKoboid },
+                        data = new DataFormDTO
+                        {
+                            nome_chefe_af = cliente.cl.Nome,
+                            DataDeNascimento = cliente.cl.Nascimento,
+                            DataEmissaoBI = cliente.cl.Bidata,
+                            NrBi = cliente.cl.Bino,
+                            LocalEmissaoBI = cliente.cl.Bilocal,
+                            telefone = cliente.cl.Tlmvl,
+                            nuit = cliente.cl.Ncont,
+                            //ncasa = (int)cliente.cl.UNcasa
+                            
+                        }
+                    },
+                };
+
+                var upd = koboAPI.UpdDataForm(body, formulario.Formid) ?? throw new Exception("Erro ao actualizar dados");
+
+                if (upd.successes != 1)
+                    throw new Exception("Erro ao actualizar dados");
+
+                _phcDynamicRepository.DeleteSyncQueue(dynamicContext, usync);
+
+                _phcDynamicRepository.SaveChanges(dynamicContext);
+            }
+            catch (DbUpdateException ex)
+            {
+                Debug.Print($"Error: {ex.InnerException?.Message ?? ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Debug.Print($"ERRO AO ActualizarDadosCl {ex.Message}");
+            }
+
+        }
+
         private decimal ParseDecimal(string value)
         {
             if (Decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result))
@@ -365,17 +525,29 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
         }
 
-        public void ProcessCliente(USyncQueue usync, string stamp, string accao, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
+        public void ProcessSyncDados(USyncQueue usync, string tabela, string stamp, string accao, string campo, string valor, ULibasedado formulario, DynamicContext dynamicContext)
         {
 
             switch (accao)
             {
                 case "UPDATE":
-                    ProcessClienteUpd(usync, stamp, campo, valor, bdStamp, dynamicContext);
+
+                    switch (tabela)
+                    {
+                        case "cl":
+                            ProcessClienteUpd(usync, stamp, campo, valor, formulario, dynamicContext);
+                            break;
+                        case "em":
+                            ActualizarDadosEm(usync, formulario, valor, dynamicContext);
+                            break;
+                        case "ft":
+                            ActualizarDadosFt(usync, stamp, campo, valor, formulario, dynamicContext);
+                            break;
+                        default: break;
+                    }
                     break;
 
-                default:
-                    break;
+                default: break;
             }
         }
 
@@ -396,7 +568,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-        public void ProcessClienteUpd(USyncQueue usync, string stamp, string campo, string valor, string bdStamp, DynamicContext dynamicContext)
+        public void ProcessClienteUpd(USyncQueue usync, string stamp, string campo, string valor, ULibasedado formulario, DynamicContext dynamicContext)
         {
             Debug.Print($"ProcessClienteUpd ");
             //var cl2 = _phcDynamicRepository.GetCl2PorStamp(dynamicContext, stamp);
@@ -409,16 +581,19 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                         if (valor == "1-Activo")
                         {
-                            SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
+                            SyncLigacao(usync, li, valor, formulario, dynamicContext);
                         }
                         else if (valor == "2-Suspenso" || valor == "3-Rescindido")
                         {
                             li.dataLigacao = li.dataTermino;
-                            SyncLigacao(usync, li, valor, bdStamp, dynamicContext);
+                            SyncLigacao(usync, li, valor, formulario, dynamicContext);
                         }
-
                         break;
 
+                    case "no":
+                        ActualizarDadosCl(usync, formulario, stamp, dynamicContext);
+
+                        break;
                     default:
                         break;
                 }
@@ -468,7 +643,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
                             nmdoc = cons.Nmdoc,
                             fno = cons.Fno,
                             totalMeticais = cons.TotalMeticais,
-                            fdata = data
+                            fdata = data,
+                            anulado= "false"
                         },
                         Group3Consumos = new Group3Consumos
                         {
@@ -517,7 +693,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
-        public void SyncLigacao(USyncQueue usync, Ligacoes lig, string estado, string stampBD, DynamicContext dynamicContext)
+        public void SyncLigacao(USyncQueue usync, Ligacoes lig, string estado, ULibasedado formulario, DynamicContext dynamicContext)
         {
             DateTimeOffset now = DateTimeOffset.Now;
             DateTimeOffset localTime = now.ToOffset(TimeSpan.FromHours(2));
@@ -562,7 +738,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-                var formID = _phcMainRepository.GetFormID("Levantamento", stampBD);
 
                 /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
                 /*
@@ -580,7 +755,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 */
 
 
-                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formID.Formid);
+                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formulario.Formid);
                 //var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(lig.IDBenefKobo, formID.Formid);
 
                 var cliente = _phcDynamicRepository.GetCl2PorIdKobo(dynamicContext, lig.IDBenefKobo);
@@ -590,8 +765,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
 
 
-                formID = _phcMainRepository.GetFormID("Ligação", stampBD);
-                Debug.Print($"stampBD {stampBD}");
+                var formID = _phcMainRepository.GetFormID("Ligação", formulario.Basedadosstamp);
+                Debug.Print($"stampBD {formulario.Basedadosstamp}");
 
                 var insertFt = koboAPI.AddDataToKobo(body, formID.Formid);
 
