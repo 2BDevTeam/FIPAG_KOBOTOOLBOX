@@ -24,23 +24,16 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
               Cron.Hourly());
             */
 
-            RecurringJob.AddOrUpdate(
-             "ProcessarFormularios_AdRC_Nacala",
-             () => KOBOService.ProcessarFormularios("OnBD_AdRN_Nacala", "Cidade_de_Nacala"),
-            "*/30 * * * *");
+            //RecurringJob.AddOrUpdate(
+            // "ProcessarFormularios_AdRC_Nacala",
+            // () => KOBOService.ProcessarFormularios("OnBD_AdRN_Nacala", "Cidade_de_Nacala"),
+            //"*/30 * * * *");
 
-            RecurringJob.AddOrUpdate(
-             "ProcessarFormularios_AdRC_Pemba",
-             () => KOBOService.ProcessarFormularios("OnBD_AdRN_Pemba", "Cidade_de_Pemba"),
-            "*/30 * * * *");
+            //RecurringJob.AddOrUpdate(
+            // "ProcessarFormularios_AdRC_Pemba",
+            // () => KOBOService.ProcessarFormularios("OnBD_AdRN_Pemba", "Cidade_de_Pemba"),
+            //"*/30 * * * *");
 
-            /*
-            RecurringJob.AddOrUpdate(
-               "ProcessarFormularios_Teste_OnBD",
-               () => KOBOService.ProcessarFormularios("OnBD_FIPAG", "Cidade_de_Nacala"),
-              Cron.Hourly());
-
-             */
 
             /*
             RecurringJob.AddOrUpdate(
@@ -49,11 +42,14 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
               Cron.Hourly());
             */
 
-            /*
+
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG_Beira",
                () => KOBOService.ProcessarFormularios("OnBD_Fipag_Beira", "Beira"),
               Cron.Hourly());
+
+
+            /*
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_OnBD_FIPAG_TETE",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG_TETE", "Cidade_de_Tete"),
