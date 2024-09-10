@@ -35,7 +35,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         public virtual DbSet<Ft3> Ft3 { get; set; } = null!;
         public virtual DbSet<Ft2> Ft2 { get; set; } = null!;
         public virtual DbSet<UBasedados> UBasedados { get; set; } = null!;
-
+        public virtual DbSet<JobLocks> JobLocks { get; set; } = null!;
         public virtual DbSet<Us> Us { get; set; } = null!;
         public virtual DbSet<USyncQueue> USyncqueue { get; set; } = null!;
         public virtual DbSet<ULibasedado> ULibasedado { get; set; } = null!;
@@ -62,6 +62,15 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                 modelBuilder.AddSqlConvertFunction();
             }
             modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+
+            modelBuilder.Entity<JobLocks>(entity =>
+            {
+                entity.HasKey(e => e.JobId)
+                    .HasName("PK__JobLocks__056690C2F4BFF789");
+                entity.Property(e => e.JobId).HasMaxLength(100);
+            });
+
 
             modelBuilder.Entity<ULibasedado>(entity =>
             {

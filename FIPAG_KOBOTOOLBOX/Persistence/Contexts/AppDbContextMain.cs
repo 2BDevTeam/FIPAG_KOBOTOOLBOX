@@ -19,6 +19,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
         }
 
 
+        public virtual DbSet<JobLocks> JobLocks { get; set; } = null!;
+
         public virtual DbSet<Obaclientes> Obaclientes { get; set; } = null!;
 
         public virtual DbSet<Log> Log { get; set; } = null!;
@@ -82,6 +84,13 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
                 modelBuilder.AddSqlConvertFunction();
             }
             modelBuilder.UseCollation("SQL_Latin1_General_CP1_CI_AS");
+
+            modelBuilder.Entity<JobLocks>(entity =>
+            {
+                entity.HasKey(e => e.JobId)
+                    .HasName("PK__JobLocks__056690C2F4BFF789");
+                entity.Property(e => e.JobId).HasMaxLength(100);
+            });
 
             modelBuilder.Entity<ULibasedado>(entity =>
             {

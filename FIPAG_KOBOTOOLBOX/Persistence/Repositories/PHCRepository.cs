@@ -19,6 +19,9 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
         }
 
 
+
+        
+
         public List<Cl> GetClients()
         {
             return _context.Set<Cl>()

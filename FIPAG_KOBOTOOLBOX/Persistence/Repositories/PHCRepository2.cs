@@ -22,6 +22,14 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
 
         private readonly ConversionExtension conversionExtension=new ConversionExtension();
 
+
+
+        public JobLocks GetJobLocks(TContext _context, string jobId)
+        {
+            return _context.Set<JobLocks>().
+                FirstOrDefault(ft => ft.JobId == jobId);
+        }
+        
         public List<Cl> GetClients(TContext _context)
         {
             return _context.Set<Cl>()
@@ -474,6 +482,10 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             appDbContext.RemoveRange(entityList);
         }
 
+        public void Delete<T>(TContext appDbContext, T entity) where T : class
+        {
+            appDbContext.Remove(entity);
+        }
     }
 }
 

@@ -6,6 +6,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
     public interface IPHCRepository2 <TContext> where TContext : DbContext
     {
 
+        public JobLocks GetJobLocks(TContext _context, string jobId);
         public List<Bo> GetBoTeste(TContext _context);
         public List<Cl> GetClients(TContext _context);
         public Cl GetClPorNo(TContext _context, int no);
@@ -29,6 +30,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
 
         public void UpsertEntity<T>(TContext appDbContext, T entity, List<string> keysToExclude, List<KeyValuePair<string, object>> conditions, bool saveChanges) where T : class;
         public void Add<T>(TContext appDbContext, T entity) where T : class;
+        public void Delete<T>(TContext appDbContext, T entity) where T : class;
 
         public void BulkDelete<T>(TContext appDbContext, IEnumerable<T> entityList) where T : class;
         public void BulkAdd<T>(TContext appDbContext, IEnumerable<T> entityList) where T : class;
@@ -37,6 +39,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
         public void BulkOverWrite<T>(TContext appDbContext, List<List<T>> entityLists) where T : class;
         public void BulkUpsertEntity<T>(TContext appDbContext, List<T> entities, List<string> keyToExclude, bool saveChanges) where T : class;
         void SaveChanges(TContext appDbContext);
+
     }
 
 }

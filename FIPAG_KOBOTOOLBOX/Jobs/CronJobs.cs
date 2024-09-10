@@ -16,7 +16,14 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
 
         public void JobHandler()
         {
-            
+
+            /*
+            RecurringJob.AddOrUpdate(
+               "ProcessarFormularios_Teste_OnBD",
+               () => KOBOService.ProcessarFormularios("OnBD_FIPAG", "Cidade_de_Nacala"),
+              Cron.Hourly());
+            */
+
             RecurringJob.AddOrUpdate(
              "ProcessarFormularios_AdRC_Nacala",
              () => KOBOService.ProcessarFormularios("OnBD_AdRN_Nacala", "Cidade_de_Nacala"),
@@ -26,8 +33,8 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
              "ProcessarFormularios_AdRC_Pemba",
              () => KOBOService.ProcessarFormularios("OnBD_AdRN_Pemba", "Cidade_de_Pemba"),
             Cron.Hourly());
-            /*
 
+            /*
             RecurringJob.AddOrUpdate(
                "ProcessarFormularios_Teste_OnBD",
                () => KOBOService.ProcessarFormularios("OnBD_FIPAG", "Cidade_de_Nacala"),

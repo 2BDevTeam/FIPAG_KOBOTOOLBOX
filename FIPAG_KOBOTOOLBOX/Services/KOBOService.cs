@@ -64,6 +64,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
         }
 
 
+        /* SyncFactura Mas esqueci em que contexto utilizei esse método
         public void SyncFactura(Consumos cons, string formId)
         {
             DateTimeOffset now = DateTimeOffset.Now;
@@ -145,32 +146,66 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "SyncFactura", errorDTO?.ToString());
             }
         }
+        */
 
 
+        public bool VerificarJobActivos(DynamicContext dynamicContext, string lockKey)
+        {
+            var jobLock = _phcDynamicRepository.GetJobLocks(dynamicContext, lockKey);
+
+            if (jobLock != null && jobLock.IsRunning)
+            {
+                Debug.Print("O job já está em execução");
+                return true;
+            }
+
+            if (jobLock == null)
+            {
+                jobLock = new JobLocks { JobId = lockKey, IsRunning = true };
+                _phcDynamicRepository.Add(dynamicContext, jobLock);
+            }
+            else
+            {
+                jobLock.IsRunning = true;
+            }
+
+            _phcDynamicRepository.SaveChanges(dynamicContext);
+            return false;
+        }
+
+        public void TerminarJob(DynamicContext dynamicContext, string lockKey)
+        {
+            var jobLock = _phcDynamicRepository.GetJobLocks(dynamicContext, lockKey);
+
+            _phcDynamicRepository.Delete(dynamicContext, jobLock);
+            _phcDynamicRepository.SaveChanges(dynamicContext);
+        }
 
         public async Task ProcessarFormularios(string nomeBd, string cidade)
         {
 
+            var bd = _phcMainRepository.GetBaseDados(nomeBd) ?? throw new Exception($"Base de Dados {nomeBd} não encontrada.");
+
+            Debug.Print($"BDs    {bd.Nomebd}");
+
+            var formularios = _phcMainRepository.GetLiBaseDados(bd.UBasedadosstamp);
+
+            var connectionString = $"Server={bd.Nomesrv.Trim()};Database={bd.Nomebd.Trim()};User Id={bd.Username.Trim()};Password={bd.Password.Trim()};Trusted_Connection=False;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False";
+            Debug.Print($"Connectiosn   {connectionString}");
+
+
+            var dynamicContext = new DynamicContext(connectionString);
+
+            string lockKey = "ProcessarFormularios";
+
+            if (VerificarJobActivos(dynamicContext, lockKey))
+                return;
+
             try
             {
-                var bd = _phcMainRepository.GetBaseDados(nomeBd) ?? throw new Exception($"Base de Dados {nomeBd} não encontrada.");
-
-                Debug.Print($"BDs    {bd.Nomebd}");
-
-                var formularios = _phcMainRepository.GetLiBaseDados(bd.UBasedadosstamp);
-
-                var connectionString = $"Server={bd.Nomesrv.Trim()};Database={bd.Nomebd.Trim()};User Id={bd.Username.Trim()};Password={bd.Password.Trim()};Trusted_Connection=False;MultipleActiveResultSets=true;TrustServerCertificate=True;Encrypt=False";
-                Debug.Print($"Connectiosn   {connectionString}");
-
-
-                var dynamicContext = new DynamicContext(connectionString);
-
-
                 foreach (var formulario in formularios)
                 {
-
                     SincrinizarDadosUSyncQueue(formulario, cidade, dynamicContext);
-
                 }
 
             }
@@ -181,13 +216,17 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 var finalResponse = new ResponseDTO(new ResponseCodesDTO("0007", "Error", logHelper.generateResponseID()), errorDTO.ToString(), null);
                 logHelper.generateResponseLogJB(finalResponse, logHelper.generateResponseID().ToString(), "ProcessarFormularios", errorDTO?.ToString());
             }
+            finally
+            {
+                TerminarJob(dynamicContext, lockKey);
+            }
 
         }
 
 
         public async Task SincrinizarDadosUSyncQueue(ULibasedado formulario, string cidade, DynamicContext dynamicContext)
         {
-            Debug.Print($"SincronizarDadosUSyncQueue    {formulario.Subnome} - {formulario.FormCidade}");
+            Debug.Print($"SincronizarDadosUSyncQueue   {formulario.Subnome} - {formulario.FormCidade}");
 
             switch (formulario.Subnome)
             {
@@ -212,7 +251,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         var syncQueueEm = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "em", "no");
                         foreach (var sq in syncQueueEm)
                         {
-                            ProcessSyncDados(sq,"em", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
+                            ProcessSyncDados(sq, "em", sq.Stamptabela, sq.Accao, sq.campo, sq.valor, formulario, dynamicContext);
                         }
                         var syncQueueCl1 = _phcDynamicRepository.GetUSyncQueue(dynamicContext, "cl", "no");
                         foreach (var sq in syncQueueCl1)
@@ -386,13 +425,13 @@ namespace FIPAG_KOBOTOOLBOX.Services
                 {
                     payload = new PayloadFormDTO
                     {
-                        submission_ids = new List<long> { (long) em.UKoboid },
+                        submission_ids = new List<long> { (long)em.UKoboid },
                         data = new DataFormDTO
                         {
-                            nome_chefe_af=em.Nome,
-                            DataDeNascimento=em.UNascimen,
-                            DataEmissaoBI=em.UBidata,
-                            NrBi=em.UBino,
+                            nome_chefe_af = em.Nome,
+                            DataDeNascimento = em.UNascimen,
+                            DataEmissaoBI = em.UBidata,
+                            NrBi = em.UBino,
                             LocalEmissaoBI = em.UBilocal,
                             telefone = em.Tlmvl,
                             nuit = em.Ncont,
@@ -429,7 +468,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             try
             {
                 var ft = _phcDynamicRepository.GetFt(dynamicContext, stamp);
-                var cl = _phcDynamicRepository.GetCliente(dynamicContext, (int) ft.No);
+                var cl = _phcDynamicRepository.GetCliente(dynamicContext, (int)ft.No);
 
                 UpdateFormDTO body = new()
                 {
@@ -438,7 +477,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                         submission_ids = new List<long> { (long)cl.cl2.UKoboid },
                         data = new DataFormDTO
                         {
-                            anulada = ft.Anulado ? "true":"false",
+                            anulada = ft.Anulado ? "true" : "false",
                         }
                     },
                 };
@@ -466,7 +505,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         public void ActualizarDadosCl(USyncQueue usync, ULibasedado formulario, string stamp, DynamicContext dynamicContext)
         {
-            
+
             try
             {
                 var cliente = _phcDynamicRepository.GetCliente(dynamicContext, stamp);
@@ -486,7 +525,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                             telefone = cliente.cl.Tlmvl,
                             nuit = cliente.cl.Ncont,
                             //ncasa = (int)cliente.cl.UNcasa
-                            
+
                         }
                     },
                 };
@@ -644,7 +683,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
                             fno = cons.Fno,
                             totalMeticais = cons.TotalMeticais,
                             fdata = data,
-                            anulado= "false"
+                            anulado = "false"
                         },
                         Group3Consumos = new Group3Consumos
                         {
@@ -735,24 +774,6 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
                 string cleanedJson = jsonObject.ToString(Formatting.None);
                 Debug.Print($"Json limpo Fatura {cleanedJson}");
-
-
-
-
-                /**** Alterado DEVIDO JOB DE SINCRONIZAR CLIENTES OBA   ****/
-                /*
-                var iddKobo = koboAPI.GetResultByIdd(lig.IDBenefKobo, formID.Formid).results
-                    .FirstOrDefault();
-
-                if (iddKobo == null)
-                {
-                    AddChangesSyncReport(lig.IDBenefKobo, lig.No, "Cliente não encontrado na lista de beneficiários do Kobotoolbox.", dynamicContext, usync);
-                    throw new Exception("Cliente não encontrado na lista de beneficiários do Kobotoolbox.");
-                }
-
-                var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(iddKobo._id, formID.Formid);
-                var updBeneficiarioAdicionado = koboAPI.UpdNaoAdicionadosPHC(iddKobo._id, formID.Formid);
-                */
 
 
                 var updBeneficiarioIsCl = koboAPI.UpdIsClientePHC(lig.IDBenefKobo, formulario.Formid);
