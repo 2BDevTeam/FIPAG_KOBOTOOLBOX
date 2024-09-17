@@ -123,7 +123,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 .Where(sq=> sq.Nometabela == nomeTab
                         && sq.campo== campo
                         )
-                .Take(1024)
+                .Take(500)
                .ToList();
         }
 

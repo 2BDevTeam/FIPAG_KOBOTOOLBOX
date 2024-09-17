@@ -28,13 +28,13 @@ namespace FIPAG_KOBOTOOLBOX.Jobs
             RecurringJob.AddOrUpdate(
              "ProcessarFormularios_AdRC_Nacala",
              () => KOBOService.ProcessarFormularios("OnBD_AdRN_Nacala", "Cidade_de_Nacala"),
-            "*/10 * * * *");
+            "*/20 * * * *");
 
 
-            //RecurringJob.AddOrUpdate(
-            // "ProcessarFormularios_AdRC_Pemba",
-            // () => KOBOService.ProcessarFormularios("OnBD_AdRN_Pemba", "Cidade_de_Pemba"),
-            //"*/30 * * * *");
+            RecurringJob.AddOrUpdate(
+             "ProcessarFormularios_AdRC_Pemba",
+             () => KOBOService.ProcessarFormularios("OnBD_AdRN_Pemba", "Cidade_de_Pemba"),
+            "*/20 * * * *");
 
 
             /*
