@@ -123,7 +123,7 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                 .Where(sq=> sq.Nometabela == nomeTab
                         && sq.campo== campo
                         )
-                .Take(350)
+                .Take(1024)
                .ToList();
         }
 
@@ -133,7 +133,8 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
             return _context.Set<USyncQueue>()
                 .Where(sq => sq.Nometabela == nomeTab
                         )
-                .Take(350)
+                //.Take(350)
+                .Take(800)
                .ToList();
         }
 
