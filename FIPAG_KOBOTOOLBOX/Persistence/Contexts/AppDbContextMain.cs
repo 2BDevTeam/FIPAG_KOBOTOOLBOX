@@ -88,8 +88,14 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Contexts
             modelBuilder.Entity<JobLocks>(entity =>
             {
                 entity.HasKey(e => e.JobId)
-                    .HasName("PK__JobLocks__056690C2F4BFF789");
+                    .HasName("PK__JobLocks__056690C257799850");
+
                 entity.Property(e => e.JobId).HasMaxLength(100);
+
+                entity.Property(e => e.DataExec)
+                    .HasColumnType("date")
+                    .HasColumnName("dataExec")
+                    .HasDefaultValueSql("('19000101')");
             });
 
             modelBuilder.Entity<ULibasedado>(entity =>

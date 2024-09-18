@@ -151,27 +151,45 @@ namespace FIPAG_KOBOTOOLBOX.Services
 
         public bool VerificarJobActivos(DynamicContext dynamicContext, string lockKey)
         {
+            // Obter o job lock baseado no lockKey
             var jobLock = _phcDynamicRepository.GetJobLocks(dynamicContext, lockKey);
 
-            if (jobLock != null && jobLock.IsRunning)
+            // Verificar se o jobLock existe
+            if (jobLock != null)
             {
-                Debug.Print("O job já está em execução");
-                return true;
-            }
+                // Verificar se o job está em execução
+                if (jobLock.IsRunning)
+                {
+                    // Verificar se o job está a ser executado por mais de 1 hora
+                    DateTime oneHourAgo = DateTime.Now.AddHours(-1);
+                    if (jobLock.DataExec < oneHourAgo)
+                    {
+                        // Atualizar a data e hora para o tempo atual
+                        jobLock.DataExec = DateTime.Now;
+                        //_phcDynamicRepository.Update(dynamicContext, jobLock);
+                        _phcDynamicRepository.SaveChanges(dynamicContext);
 
-            if (jobLock == null)
-            {
-                jobLock = new JobLocks { JobId = lockKey, IsRunning = true };
-                _phcDynamicRepository.Add(dynamicContext, jobLock);
+                        Debug.Print("O job estava em execução há mais de 1 hora. A data foi atualizada.");
+                    }
+                    else
+                    {
+                        Debug.Print("O job já está em execução.");
+                        return true;
+                    }
+                }
             }
             else
             {
-                jobLock.IsRunning = true;
+                // Caso não haja um jobLock, criar um novo
+                DateTime now = DateTime.Now;
+                jobLock = new JobLocks { JobId = lockKey, IsRunning = true, DataExec = now };
+                _phcDynamicRepository.Add(dynamicContext, jobLock);
+                _phcDynamicRepository.SaveChanges(dynamicContext);
             }
 
-            _phcDynamicRepository.SaveChanges(dynamicContext);
             return false;
         }
+
 
         public void TerminarJob(DynamicContext dynamicContext, string lockKey)
         {
@@ -222,7 +240,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 TerminarJob(dynamicContext, lockKey);
             }
-            
+
             //TerminarJob(dynamicContext, lockKey);
 
         }
