@@ -181,6 +181,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
             _phcDynamicRepository.SaveChanges(dynamicContext);
         }
 
+
+        [DisableConcurrentExecution(timeoutInSeconds: 40 * 60)]
         public async Task ProcessarFormularios(string nomeBd, string cidade)
         {
 
@@ -220,6 +222,8 @@ namespace FIPAG_KOBOTOOLBOX.Services
             {
                 TerminarJob(dynamicContext, lockKey);
             }
+            
+            //TerminarJob(dynamicContext, lockKey);
 
         }
 

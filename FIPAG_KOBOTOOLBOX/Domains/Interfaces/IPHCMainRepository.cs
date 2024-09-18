@@ -19,6 +19,7 @@ namespace FIPAG_KOBOTOOLBOX.Domains.Interfaces
         public decimal GetNoEm();
         public void DeleteLiftqueue(USyncQueue syncQueue);
         public UBasedados GetBaseDados(string nomeBd);
+        public List<UBasedados> GetBaseDados();
         public List<ULibasedado> GetLiBaseDados(string Basedadosstamp);
         public ULibasedado GetFormID(string nome, string bdstamp);
     }

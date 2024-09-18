@@ -213,6 +213,12 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.Repositories
                .FirstOrDefault(bd => bd.Nomebd == nomeBd);
         }
 
+        public List<UBasedados> GetBaseDados()
+        {
+            return _context.Set<UBasedados>()
+               .ToList();
+        }
+
         public List<ULibasedado> GetLiBaseDados(string Basedadosstamp)
         {
             return _context.Set<ULibasedado>()
