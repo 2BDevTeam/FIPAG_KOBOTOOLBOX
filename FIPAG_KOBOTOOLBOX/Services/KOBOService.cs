@@ -238,7 +238,7 @@ namespace FIPAG_KOBOTOOLBOX.Services
             }
             finally
             {
-                TerminarJob(dynamicContext, lockKey);
+                //TerminarJob(dynamicContext, lockKey);
             }
 
             TerminarJob(dynamicContext, lockKey);
