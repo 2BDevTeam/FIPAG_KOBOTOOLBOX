@@ -1,14 +1,13 @@
 ﻿using Newtonsoft.Json;
 
-namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
+namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.DTOs
 {
-    public class InsertFormV2DTO
+    public class InsertFormDTO
     {
         public string id { get; set; }
         public SubmissionDataDTO submission { get; set; }
     }
 
-    /*
     public class SubmissionDataDTO
     {
         public MetaDataDTO meta { get; set; }
@@ -32,6 +31,5 @@ namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
     {
         public string instanceID { get; set; }
     }
-    */
 
 }

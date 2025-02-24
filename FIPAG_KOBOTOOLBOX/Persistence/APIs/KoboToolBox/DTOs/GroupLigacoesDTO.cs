@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
+namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.DTOs
 {
 
     public class Group1Ligacoes

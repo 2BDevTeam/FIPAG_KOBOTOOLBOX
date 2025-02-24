@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 
-namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.DTOs
+namespace FIPAG_KOBOTOOLBOX.Persistence.APIs.KoboToolBox.DTOs
 {
 
     public class Group1Consumos
     {
-        public long no{ get; set; }
-        public string nome{ get; set; }
+        public long no { get; set; }
+        public string nome { get; set; }
         [JsonProperty(PropertyName = "ID_Benef_Kobo")]
         public long IDBenefKobo { get; set; }
     }
